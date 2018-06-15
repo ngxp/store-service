@@ -15,6 +15,14 @@
     "lib": [
       "es2017",
       "dom"
-    ]
+    ],
+    "paths": {
+      "ngrx-store-service": [
+        "dist/ngrx-store-service"
+      ],
+      "ngrx-store-service/*": [
+        "dist/ngrx-store-service/*"
+      ]
+    }
   }
 }
