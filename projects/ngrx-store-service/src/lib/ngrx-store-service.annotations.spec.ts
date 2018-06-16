@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { NGRX_STORE_SERVICE_storeVariableName, Selector, StoreService } from 'projects/ngrx-store-service/src/lib/ngrx-store-service.annotations';
+import { NGRX_STORE_SERVICE_storeVariableName, Selector, StoreService } from './ngrx-store-service.annotations';
 import { Observable, of } from 'rxjs';
 
 const state = {
