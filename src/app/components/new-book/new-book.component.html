@@ -1,3 +1,15 @@
-<p>
-  new-book works!
-</p>
+<form class="form">
+    <label>
+        Author
+        <input type="text" class="form-control" [(ngModel)]="book.author" name="author">
+    </label>
+    <label>
+        Title
+        <input type="text" class="form-control" [(ngModel)]="book.title" name="title">
+    </label>
+    <label>
+        Year
+        <input type="number" class="form-control" [(ngModel)]="book.year" name="year">
+    </label>
+    <button type="submit" class="submit" (click)="addBook($event)">Add Book</button>
+</form>

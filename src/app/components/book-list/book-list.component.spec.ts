@@ -4,6 +4,7 @@ import { BookListComponent } from './book-list.component';
 import { BookStoreService } from 'src/app/shared/books/book-store.service';
 import { provideStoreServiceMock, StoreServiceMock } from 'ngrx-store-service/testing';
 import { Book } from 'src/app/shared/books/book.model';
+import { AppModule } from 'src/app/app.module';
 
 describe('BookListComponent', () => {
     let component: BookListComponent;
@@ -12,7 +13,7 @@ describe('BookListComponent', () => {
 
     beforeEach(async(() => {
         TestBed.configureTestingModule({
-            declarations: [BookListComponent],
+            imports: [AppModule],
             providers: [
                 {
                     provide: BookStoreService,
@@ -35,7 +36,7 @@ describe('BookListComponent', () => {
     });
 
     it('renders no books if subject has not emitted', () => {
-        const length = (<Element>fixture.nativeElement).querySelectorAll('li').length;
+        const length = (<Element>fixture.nativeElement).querySelectorAll('nss-book-list-entry').length;
 
         expect(length).toBe(0);
     });
@@ -56,7 +57,7 @@ describe('BookListComponent', () => {
         bookStoreService.getAllBooks().next(books);
 
         fixture.detectChanges();
-        const length = (<Element>fixture.nativeElement).querySelectorAll('li').length;
+        const length = (<Element>fixture.nativeElement).querySelectorAll('nss-book-list-entry').length;
 
         expect(books.length).toBe(length);
 

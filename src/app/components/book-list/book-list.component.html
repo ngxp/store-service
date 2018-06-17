@@ -1,6 +1,7 @@
-<ul>
-    <li *ngFor="let book of (books$ | async)">
-        <h1>{{ book.title }}</h1>
-        <span>{{ book.year }} by {{ book.author }}</span>
-    </li>
-</ul>
+<div *ngFor="let book of (books$ | async)">
+    <nss-book-list-entry [book]="book"></nss-book-list-entry>
+</div>
+
+<span *ngIf="books$ | async">
+    {{ (books$ | async).length }} books total
+</span>
