@@ -3,3 +3,4 @@
  */
 
 export * from './lib/ngrx-store-service.annotations';
+export * from './lib/ngrx-store-service';
