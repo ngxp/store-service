@@ -1,25 +1,14 @@
-import { TestBed, async } from '@angular/core/testing';
-import { AppComponent } from './app.component';
-import { AppModule } from 'src/app/app.module';
+import { async, TestBed } from '@angular/core/testing';
 import { NgrxStoreServiceTestingModule } from 'ngrx-store-service/testing';
-import { State } from 'src/app/store/store.model';
+import { AppModule } from 'src/app/app.module';
+import { getState } from 'src/test/state';
+import { AppComponent } from './app.component';
 describe('AppComponent', () => {
-    const state: State = {
-        books: {
-            books: [
-                {
-                    author: 'Author',
-                    title: 'Title',
-                    year: 2018
-                }
-            ]
-        }
-    };
     beforeEach(async(() => {
         TestBed.configureTestingModule({
             imports: [
                 AppModule,
-                NgrxStoreServiceTestingModule.withState(state)
+                NgrxStoreServiceTestingModule.withState(getState())
             ],
         }).compileComponents();
     }));

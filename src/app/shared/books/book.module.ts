@@ -6,6 +6,8 @@ import { BookStoreService } from 'src/app/shared/books/book-store.service';
     imports: [
         CommonModule
     ],
-    providers: [BookStoreService],
+    providers: [
+        BookStoreService
+    ],
 })
 export class BookModule { }
