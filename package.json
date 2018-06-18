@@ -5,7 +5,8 @@
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",
-    "test": "ng test",
+    "build:lib": "ng build ngrx-store-service",
+    "test:lib": "ng test ngrx-store-service",
     "lint": "ng lint",
     "e2e": "ng e2e"
   },
