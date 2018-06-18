@@ -34,9 +34,11 @@ export class NgrxStoreServiceTestingModule {
         };
     }
 }
-
 export type StoreServiceMock<T> = {
-    [P in keyof T]: () => BehaviorSubject<any>;
+    // [K in keyof T]: ReturnType<T[K]> extends Observable<any> ? BehaviorSubject<any> : void
+    // Uncomment when conditional types work in Angular
+    // https://github.com/angular/angular/issues/23779
+    [K in keyof T]: BehaviorSubject<any>
 };
 
 export function provideStoreServiceMock<T>(
@@ -58,7 +60,6 @@ export function provideStoreServiceMock<T>(
                 enumerable: true
             });
         });
-
     const serviceMock: StoreServiceMock<T> = <any>service;
     return serviceMock;
 }
