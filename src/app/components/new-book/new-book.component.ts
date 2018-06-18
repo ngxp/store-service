@@ -22,7 +22,7 @@ export class NewBookComponent {
 
     addBook(event: Event) {
         event.preventDefault();
-        this.bookStore.dispatch(new AddBookAction(this.book));
+        this.bookStore.addBook(this.book);
         this.resetForm();
     }
 

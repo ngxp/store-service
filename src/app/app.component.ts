@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { BookStoreService } from 'src/app/shared/books/book-store.service';
-import { LoadBooksAction } from 'src/app/store/books/books.actions';
 
 @Component({
     selector: 'nss-root',
@@ -14,6 +13,6 @@ export class AppComponent implements OnInit {
     ) {}
 
     ngOnInit() {
-        this.bookStore.dispatch(new LoadBooksAction());
+        this.bookStore.loadBooks();
     }
 }

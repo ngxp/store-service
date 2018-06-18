@@ -1,20 +1,44 @@
-import { async, TestBed } from '@angular/core/testing';
-import { NgrxStoreServiceTestingModule } from 'ngrx-store-service/testing';
+import { async, TestBed, ComponentFixture } from '@angular/core/testing';
+import { provideStoreServiceMock, StoreServiceMock } from 'ngrx-store-service/testing';
 import { AppModule } from 'src/app/app.module';
-import { getState } from 'src/test/state';
+import { BookStoreService } from 'src/app/shared/books/book-store.service';
 import { AppComponent } from './app.component';
+
 describe('AppComponent', () => {
+    let fixture: ComponentFixture<AppComponent>;
+    let component: AppComponent;
+    let bookStoreService: StoreServiceMock<BookStoreService>;
+
     beforeEach(async(() => {
         TestBed.configureTestingModule({
             imports: [
-                AppModule,
-                NgrxStoreServiceTestingModule.withState(getState())
+                AppModule
             ],
+            providers: [
+                {
+                    provide: BookStoreService,
+                    useValue: provideStoreServiceMock(BookStoreService)
+                }
+            ]
         }).compileComponents();
     }));
+
+    beforeEach(() => {
+        fixture = TestBed.createComponent(AppComponent);
+        bookStoreService = TestBed.get(BookStoreService);
+        component = fixture.componentInstance;
+        fixture.detectChanges();
+    });
+
     it('should create the app', async(() => {
-        const fixture = TestBed.createComponent(AppComponent);
         const app = fixture.debugElement.componentInstance;
         expect(app).toBeTruthy();
     }));
+
+    it('loads books on init', () => {
+        const loadBooksSpy = spyOn(bookStoreService, 'loadBooks');
+
+        component.ngOnInit();
+        expect(loadBooksSpy).toHaveBeenCalled();
+    });
 });
