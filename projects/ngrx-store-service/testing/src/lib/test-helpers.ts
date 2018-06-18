@@ -1,6 +1,7 @@
 import { ModuleWithProviders, NgModule, Type } from '@angular/core';
 import { Action, Store } from '@ngrx/store';
 import { BehaviorSubject, Observable, of } from 'rxjs';
+import { NGRX_STORE_SERVICE_SELECTORS } from 'ngrx-store-service';
 
 export class MockStore {
 
@@ -40,15 +41,13 @@ export type StoreServiceMock<T> = {
 
 export function provideStoreServiceMock<T>(
     serviceClass: Type<T>,
-    initialValues: { [P in keyof T]?: any } = {},
-    ignoreProps: string[] = []): StoreServiceMock<T> {
+    initialValues: { [P in keyof T]?: any } = {}): StoreServiceMock<T> {
 
-    const service = new serviceClass();
-
-    const propsToIgnore: string[] = ['store', 'dispatch', ...ignoreProps];
+    const store = new MockStore(null);
+    const service = new serviceClass(store);
 
     Object.keys(serviceClass.prototype)
-        .filter(key => !propsToIgnore.includes(key))
+        .filter(key => serviceClass.prototype[NGRX_STORE_SERVICE_SELECTORS].includes(key))
         .forEach(key => {
             const initialValue = initialValues[key] ? initialValues[key] : undefined;
             const subject = new BehaviorSubject(initialValue);
