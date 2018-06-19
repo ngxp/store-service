@@ -1,7 +1,7 @@
 import { ModuleWithProviders, NgModule, Type } from '@angular/core';
 import { Action, Store } from '@ngrx/store';
 import { BehaviorSubject, Observable, of } from 'rxjs';
-import { NGRX_STORE_SERVICE_SELECTORS } from 'ngrx-store-service';
+import { NGRX_STORE_SERVICE_SELECTORS, StoreServiceClass } from 'ngrx-store-service';
 
 export class MockStore {
 
@@ -34,11 +34,14 @@ export class NgrxStoreServiceTestingModule {
         };
     }
 }
+// type SelectorMethod<R> = (...args: any[]) => BehaviorSubject<R>;
+// type ActionDispatcherMethod = () => void;
+
 export type StoreServiceMock<T> = {
-    // [K in keyof T]: ReturnType<T[K]> extends Observable<any> ? BehaviorSubject<any> : void
+    // [K in keyof T]: T[K] extends (...args: any[]) => Observable<infer R> ? SelectorMethod<R> : ActionDispatcherMethod
     // Uncomment when conditional types work in Angular
     // https://github.com/angular/angular/issues/23779
-    [K in keyof T]: BehaviorSubject<any>
+    [K in keyof T]: (...args) => BehaviorSubject<any>
 };
 
 export function provideStoreServiceMock<T>(
