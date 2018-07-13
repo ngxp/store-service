@@ -1,9 +1,26 @@
 import { Injectable } from '@angular/core';
-import { Selector, Action, NGRX_STORE_SERVICE_SELECTORS, NGRX_STORE_SERVICE_ACTIONS } from './ngrx-store-service.annotations';
+import { Action as NgrxAction } from '@ngrx/store';
 import { Observable, of } from 'rxjs';
 import { StoreServiceClass } from './ngrx-store-service';
-import { MockStore } from 'ngrx-store-service/testing';
-import { Action as NgrxAction } from '@ngrx/store';
+import { Action, NGRX_STORE_SERVICE_ACTIONS, NGRX_STORE_SERVICE_SELECTORS, Selector } from './ngrx-store-service.annotations';
+
+// Needed because we can't import from testing...
+class MockStore {
+
+    dispatchedActions: NgrxAction[] = [];
+
+    constructor(
+        private _state
+    ) { }
+
+    select(projectionFn: (state: any) => any) {
+        return of(projectionFn(this._state));
+    }
+
+    dispatch(action: NgrxAction) {
+        this.dispatchedActions.push(action);
+    }
+}
 
 const state = {
     property: 'someProperty'
