@@ -1,6 +1,7 @@
 import { ModuleWithProviders, NgModule, Type } from '@angular/core';
 import { Action, Store } from '@ngrx/store';
 import { BehaviorSubject, of } from 'rxjs';
+import { Observable } from 'rxjs';
 
 // Needed because otherwise the build would fail.
 const NGRX_STORE_SERVICE_SELECTORS = 'NGRX_STORE_SERVICE_SELECTORS';
