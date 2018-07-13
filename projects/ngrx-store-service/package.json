@@ -1,10 +1,30 @@
 {
-  "name": "ngrx-store-service",
-  "version": "0.0.1",
-  "peerDependencies": {
-    "@angular/common": "^6.0.0-rc.0 || ^6.0.0",
-    "@angular/core": "^6.0.0-rc.0 || ^6.0.0",
-    "@ngrx/store": "^6.0.1",
-    "rxjs": "^6.0.0"
-  }
+    "name": "ngrx-store-service",
+    "author": {
+        "name": "Joost Zöllner",
+        "email": "github@joost.io"
+    },
+    "repository": {
+        "url": "https://github.com/joostme/ngrx-store-service"
+    },
+    "description": "Adds an abstraction layer between Angular component and the ngrx store with powerful testing helpers",
+    "keywords": [
+        "ngrx",
+        "angular",
+        "store",
+        "store service",
+        "abstraction",
+        "testing"
+    ],
+    "bugs": {
+        "url": "https://github.com/joostme/ngrx-store-service/issues"
+    },
+    "license": "MIT",
+    "version": "0.0.1",
+    "peerDependencies": {
+        "@angular/common": "^6.0.0-rc.0 || ^6.0.0",
+        "@angular/core": "^6.0.0-rc.0 || ^6.0.0",
+        "@ngrx/store": "^6.0.1",
+        "rxjs": "^6.0.0"
+    }
 }

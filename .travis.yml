@@ -1,0 +1,21 @@
+sudo: required
+addons:
+  chrome: stable
+language: node_js
+node_js:
+- node
+script:
+- npm run test:lib
+- npm run build:lib
+before_deploy:
+- cp README.md dist/ngrx-store-service/README.md
+- cd dist/ngrx-store-service
+deploy:
+  provider: npm
+  email: github@joost.io
+  api_key:
+    secure: InPW8wbGu+c21FXiqZ0Y68H+j2pU7ideXzT14Xh3cUvrvxH4XgXKZdd5RciAtEFV17QgLiF3+cUMD4EieNf76A5jo59lpIqRXVp2oTknrgiCI/d0ow36oy/4T8bZhS3/PUMqhM3XUcvgm2/IitqqX4SUBxrFyFCEo+iFP11mKL24sOMyyk9cte3HZiWPx8Gmm+Ar0SRWVrvjEyWNih2gTFVYbv0GTn7ds3hFxojA80zgy8BK47zXCD9rNIEOiMiiTOLYDBQ1BKxJjeV4EiqMyvwOtrF4Xaovckc9E2DIU8bZhk+2AxZKlQklE0JmhAqz94WOa5YOp4SBaPLs3/6h3jQ5wjFPx9SIR7br9vB5rHXkhSN8ACNz/jWqDuSfqcFN16S0cfmGDdrpPO3CEaqv7P3IMryr/fjE+B8eZF+AwPSFjJYLWmC3ss/KA0bxbzi3KdWxP04GRfUXp5aWLOVtxgC31XaS6Tsg+FHbJgvV/Bk647a3rBJvj6qFqpDOOdvQxTpjgiFAA55AGdXrPBu4335wOPd7BNUqyFC+Ala17EKuwQdx9Hz9oNZTxeJdzWoJIkJuv7PEyiVDlxOTcrB6GgAio4d+7o6OQBIKbR5NRassdNPp6Ig604eNNjmSvE3aIaWEA17nnzA7Z6FNUEiAnt86GHF4wgvy8iAPM/L1mhg=
+  on:
+    tags: true
+    branch: master
+    repo: joostme/ngrx-store-service
