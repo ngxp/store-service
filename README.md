@@ -1,4 +1,4 @@
-# ngrx-store-service
+# @ngx-patterns/store-service
 
 Adds an abstraction layer between Angular components and the [@ngrx](https://github.com/ngrx/platform) store. This decouples the components from the store, selectors and actions and makes it easier to test components.
 
@@ -74,7 +74,7 @@ export class BookListComponent {
 
 ```ts
 import { Injectable } from '@angular/core';
-import { Selector, StoreService, Action } from 'ngrx-store-service';
+import { Selector, StoreService, Action } from '@ngx-patterns/store-service';
 import { Observable } from 'rxjs';
 import { Book } from 'src/app/shared/books/book.model';
 import { getBooks } from 'src/app/store/books/books.selectors';
@@ -204,7 +204,7 @@ Simply provide the `StoreService` using the `provideStoreServiceMock` method. Th
 
 
 ```ts
-import { provideStoreServiceMock, StoreServiceMock } from 'ngrx-store-service/testing';
+import { provideStoreServiceMock, StoreServiceMock } from '@ngx-patterns/store-service/testing';
 ...
 let bookStoreService: StoreServiceMock<BookStoreService>;
 ...
@@ -235,7 +235,7 @@ To test if a component dispatches actions import the `NgrxStoreServiceTestingMod
 To get the injected Store instance use the `MockStore` class to get the correct typings.
 
 ```ts
-import { NgrxStoreServiceTestingModule, MockStore } from 'ngrx-store-service/testing';
+import { NgrxStoreServiceTestingModule, MockStore } from '@ngx-patterns/store-service/testing';
 ...
 let mockStore: MockStore;
 ...
@@ -251,7 +251,7 @@ mockStore = TestBed.get(Store);
 Optionally use the `withState(...)` function on the `NgrxStoreServiceTestingModule` to provide an object used as the state.
 
 ```ts
-import { NgrxStoreServiceTestingModule} from 'ngrx-store-service/testing';
+import { NgrxStoreServiceTestingModule} from '@ngx-patterns/store-service/testing';
 ...
 const state = {
     books: []
