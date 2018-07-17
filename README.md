@@ -114,7 +114,7 @@ allBooks: () => Observable<Book[]>;
 ```
 The selector needs to be a __function__.
 
-Be sure to use correct typing for the property inside the `StoreService`. If a parameter is needed inside the selector function it also has to be defined in the property typing.
+Be sure to use correct typing for the property inside the `StoreService`. If a parameter is required inside the selector function it also has to be required in the property typing.
 
 ```ts
 export function selectBookById(id: number) {
@@ -146,7 +146,7 @@ export class LoadBooksAction implements Action {
 loadBooks: () => void;
 ```
 
-If the Action class expects parameters the typings on the property inside the `StoreService` have to match the class constructor.
+If the Action class expects parameters, the typings on the property inside the `StoreService` have to match the class constructor.
 
 ```ts
 export class AddBookAction implements Action {
@@ -241,14 +241,28 @@ let mockStore: MockStore;
 ...
 TestBed.configureTestingModule({
     imports: [
-        NgrxStoreServiceTestingModule.withState({})
+        NgrxStoreServiceTestingModule
     ]
 })
 ...
 mockStore = TestBed.get(Store);
 ```
 
-The `withState(...)` function is __mandatory__. You can use an object that you can later manipulate to get a desired state.
+Optionally use the `withState(...)` function on the `NgrxStoreServiceTestingModule` to provide an object used as the state.
+
+```ts
+import { NgrxStoreServiceTestingModule} from 'ngrx-store-service/testing';
+...
+const state = {
+    books: []
+}
+...
+TestBed.configureTestingModule({
+    imports: [
+        NgrxStoreServiceTestingModule.withState(state)
+    ]
+})
+```
 
 The `MockStore` class has a `dispatchedActions` property which is an array of dispatched actions. The last dispatched action is added at the end.
 
