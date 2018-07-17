@@ -1,11 +1,11 @@
 {
-    "name": "ngrx-store-service",
+    "name": "@ngx-patterns/store-service",
     "author": {
         "name": "Joost Zöllner",
         "email": "github@joost.io"
     },
     "repository": {
-        "url": "https://github.com/joostme/ngrx-store-service"
+        "url": "https://github.com/ngx-patterns/store-service"
     },
     "description": "Adds an abstraction layer between Angular component and the ngrx store with powerful testing helpers",
     "keywords": [
@@ -17,7 +17,7 @@
         "testing"
     ],
     "bugs": {
-        "url": "https://github.com/joostme/ngrx-store-service/issues"
+        "url": "https://github.com/ngx-patterns/store-service/issues"
     },
     "license": "MIT",
     "version": "0.0.1",
