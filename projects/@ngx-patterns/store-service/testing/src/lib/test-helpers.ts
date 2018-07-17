@@ -4,8 +4,7 @@ import { BehaviorSubject, of } from 'rxjs';
 import { Observable } from 'rxjs';
 
 // Needed because otherwise the build would fail.
-const NGRX_STORE_SERVICE_SELECTORS = 'NGRX_STORE_SERVICE_SELECTORS';
-
+export const STORE_SERVICE_SELECTORS = '__STORE_SERVICE_SELECTORS';
 
 export class MockStore {
 
@@ -63,7 +62,7 @@ export function provideStoreServiceMock<T>(
     const service = new serviceClass(store);
 
     Object.keys(serviceClass.prototype)
-        .filter(key => serviceClass.prototype[NGRX_STORE_SERVICE_SELECTORS].includes(key))
+        .filter(key => serviceClass.prototype[STORE_SERVICE_SELECTORS].includes(key))
         .forEach(key => {
             const initialValue = initialValues[key] ? initialValues[key] : undefined;
             const subject = new BehaviorSubject(initialValue);

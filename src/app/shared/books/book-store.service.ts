@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Selector, StoreService, Action } from 'ngrx-store-service';
+import { Selector, StoreService, Action } from '@ngx-patterns/store-service';
 import { Observable } from 'rxjs';
 import { Book } from 'src/app/shared/books/book.model';
 import { getBooks } from 'src/app/store/books/books.selectors';

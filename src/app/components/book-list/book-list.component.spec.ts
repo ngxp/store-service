@@ -2,7 +2,7 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { BookListComponent } from './book-list.component';
 import { BookStoreService } from 'src/app/shared/books/book-store.service';
-import { provideStoreServiceMock, StoreServiceMock } from 'ngrx-store-service/testing';
+import { provideStoreServiceMock, StoreServiceMock } from '@ngx-patterns/store-service/testing';
 import { Book } from 'src/app/shared/books/book.model';
 import { AppModule } from 'src/app/app.module';
 

@@ -1,5 +1,5 @@
 import { async, TestBed } from '@angular/core/testing';
-import { NgrxStoreServiceTestingModule, MockStore } from 'ngrx-store-service/testing';
+import { NgrxStoreServiceTestingModule, MockStore } from '@ngx-patterns/store-service/testing';
 import { BookStoreService } from 'src/app/shared/books/book-store.service';
 import { BookModule } from 'src/app/shared/books/book.module';
 import { State } from 'src/app/store/store.model';

@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { Action as NgrxAction } from '@ngrx/store';
 import { Observable, of } from 'rxjs';
-import { StoreService } from './ngrx-store-service';
-import { Action, NGRX_STORE_SERVICE_ACTIONS, NGRX_STORE_SERVICE_SELECTORS, Selector } from './ngrx-store-service.annotations';
+import { StoreService } from './store-service';
+import { Action, STORE_SERVICE_ACTIONS, STORE_SERVICE_SELECTORS, Selector } from './store-service.annotations';
 
 // Needed because we can't import from testing...
 class MockStore {
@@ -81,7 +81,7 @@ describe('Ngrx Store Service Annotations', () => {
 
         it('sets the selectors variable', () => {
 
-            expect(service[NGRX_STORE_SERVICE_SELECTORS]).toContain('getStateProp');
+            expect(service[STORE_SERVICE_SELECTORS]).toContain('getStateProp');
         });
     });
 
@@ -111,7 +111,7 @@ describe('Ngrx Store Service Annotations', () => {
         });
 
         it('sets the actions variable', () => {
-            expect(service[NGRX_STORE_SERVICE_ACTIONS]).toContain('addEntity');
+            expect(service[STORE_SERVICE_ACTIONS]).toContain('addEntity');
         });
     });
 });

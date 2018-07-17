@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "ngrx-store-service-sample": {
+    "@ngx-patterns/store-service-sample": {
       "root": "",
       "sourceRoot": "src",
       "projectType": "application",
@@ -17,7 +17,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
-            "outputPath": "dist/ngrx-store-service-sample",
+            "outputPath": "dist/@ngx-patterns/store-service-sample",
             "index": "src/index.html",
             "main": "src/main.ts",
             "polyfills": "src/polyfills.ts",
@@ -54,18 +54,18 @@
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "browserTarget": "ngrx-store-service-sample:build"
+            "browserTarget": "@ngx-patterns/store-service-sample:build"
           },
           "configurations": {
             "production": {
-              "browserTarget": "ngrx-store-service-sample:build:production"
+              "browserTarget": "@ngx-patterns/store-service-sample:build:production"
             }
           }
         },
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "ngrx-store-service-sample:build"
+            "browserTarget": "@ngx-patterns/store-service-sample:build"
           }
         },
         "test": {
@@ -99,7 +99,7 @@
         }
       }
     },
-    "ngrx-store-service-sample-e2e": {
+    "@ngx-patterns/store-service-sample-e2e": {
       "root": "e2e/",
       "projectType": "application",
       "architect": {
@@ -107,11 +107,11 @@
           "builder": "@angular-devkit/build-angular:protractor",
           "options": {
             "protractorConfig": "e2e/protractor.conf.js",
-            "devServerTarget": "ngrx-store-service-sample:serve"
+            "devServerTarget": "@ngx-patterns/store-service-sample:serve"
           },
           "configurations": {
             "production": {
-              "devServerTarget": "ngrx-store-service-sample:serve:production"
+              "devServerTarget": "@ngx-patterns/store-service-sample:serve:production"
             }
           }
         },
@@ -126,38 +126,38 @@
         }
       }
     },
-    "ngrx-store-service": {
-      "root": "projects/ngrx-store-service",
-      "sourceRoot": "projects/ngrx-store-service/src",
+    "@ngx-patterns/store-service": {
+      "root": "projects/@ngx-patterns/store-service",
+      "sourceRoot": "projects/@ngx-patterns/store-service/src",
       "projectType": "library",
       "prefix": "lib",
       "architect": {
         "build": {
           "builder": "@angular-devkit/build-ng-packagr:build",
           "options": {
-            "tsConfig": "projects/ngrx-store-service/tsconfig.lib.json",
-            "project": "projects/ngrx-store-service/ng-package.json"
+            "tsConfig": "projects/@ngx-patterns/store-service/tsconfig.lib.json",
+            "project": "projects/@ngx-patterns/store-service/ng-package.json"
           },
           "configurations": {
             "production": {
-              "project": "projects/ngrx-store-service/ng-package.prod.json"
+              "project": "projects/@ngx-patterns/store-service/ng-package.prod.json"
             }
           }
         },
         "test": {
           "builder": "@angular-devkit/build-angular:karma",
           "options": {
-            "main": "projects/ngrx-store-service/src/test.ts",
-            "tsConfig": "projects/ngrx-store-service/tsconfig.spec.json",
-            "karmaConfig": "projects/ngrx-store-service/karma.conf.js"
+            "main": "projects/@ngx-patterns/store-service/src/test.ts",
+            "tsConfig": "projects/@ngx-patterns/store-service/tsconfig.spec.json",
+            "karmaConfig": "projects/@ngx-patterns/store-service/karma.conf.js"
           }
         },
         "lint": {
           "builder": "@angular-devkit/build-angular:tslint",
           "options": {
             "tsConfig": [
-              "projects/ngrx-store-service/tsconfig.lib.json",
-              "projects/ngrx-store-service/tsconfig.spec.json"
+              "projects/@ngx-patterns/store-service/tsconfig.lib.json",
+              "projects/@ngx-patterns/store-service/tsconfig.spec.json"
             ],
             "exclude": [
               "**/node_modules/**"
@@ -167,5 +167,5 @@
       }
     }
   },
-  "defaultProject": "ngrx-store-service-sample"
+  "defaultProject": "@ngx-patterns/store-service-sample"
 }
