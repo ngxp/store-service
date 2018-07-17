@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Action as NgrxAction } from '@ngrx/store';
 import { Observable, of } from 'rxjs';
-import { StoreServiceClass } from './ngrx-store-service';
+import { StoreService } from './ngrx-store-service';
 import { Action, NGRX_STORE_SERVICE_ACTIONS, NGRX_STORE_SERVICE_SELECTORS, Selector } from './ngrx-store-service.annotations';
 
 // Needed because we can't import from testing...
@@ -39,7 +39,7 @@ class AddEntityAction implements NgrxAction {
     ) { }
 }
 @Injectable()
-class MockService extends StoreServiceClass<any> {
+class MockService extends StoreService<any> {
     @Selector(selectorFn)
     getStateProp: (propName: string) => Observable<string>;
 

@@ -74,7 +74,7 @@ export class BookListComponent {
 
 ```ts
 import { Injectable } from '@angular/core';
-import { Selector, StoreServiceClass, Action } from 'ngrx-store-service';
+import { Selector, StoreService, Action } from 'ngrx-store-service';
 import { Observable } from 'rxjs';
 import { Book } from 'src/app/shared/books/book.model';
 import { getBooks } from 'src/app/store/books/books.selectors';
@@ -82,7 +82,7 @@ import { State } from 'src/app/store/store.model';
 import { AddBookAction } from 'src/app/store/books/books.actions';
 
 @Injectable()
-export class BookStoreService extends StoreServiceClass<State> {
+export class BookStoreService extends StoreService<State> {
 
     @Selector(getBooks) // <- Selector
     getAllBooks: () => Observable<Book[]>;
@@ -92,9 +92,9 @@ export class BookStoreService extends StoreServiceClass<State> {
 }
 ```
 
-## StoreServiceClass
+## StoreService
 
-The `StoreService` Injectable class should extend the `StoreServiceClass<State>` class where `State` is your ngrx state model.
+The `BookStoreService` Injectable class should extend the `StoreService<State>` class where `State` is your ngrx state model.
 
 ## Selectors
 
