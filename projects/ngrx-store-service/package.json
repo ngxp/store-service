@@ -4,6 +4,9 @@
         "name": "Joost Zöllner",
         "email": "github@joost.io"
     },
+    "publishConfig": {
+        "access": "public"
+    },
     "repository": {
         "url": "https://github.com/ngx-patterns/store-service"
     },
