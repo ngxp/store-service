@@ -24,7 +24,7 @@
         "url": "https://github.com/ngx-patterns/store-service/issues"
     },
     "license": "MIT",
-    "version": "1.0.3",
+    "version": "1.0.4",
     "peerDependencies": {
         "@angular/common": "^6.0.0-rc.0 || ^6.0.0",
         "@angular/core": "^6.0.0-rc.0 || ^6.0.0",
