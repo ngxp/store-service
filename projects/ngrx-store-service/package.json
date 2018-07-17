@@ -8,6 +8,7 @@
         "access": "public"
     },
     "repository": {
+        "type" : "git",
         "url": "https://github.com/ngx-patterns/store-service"
     },
     "description": "Adds an abstraction layer between Angular component and the ngrx store with powerful testing helpers",
