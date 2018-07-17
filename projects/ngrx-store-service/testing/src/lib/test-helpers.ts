@@ -24,7 +24,14 @@ export class MockStore {
     }
 }
 
-@NgModule()
+@NgModule({
+    providers: [
+        {
+            provide: Store,
+            useValue: new MockStore({})
+        }
+    ]
+})
 export class NgrxStoreServiceTestingModule {
     static withState(state: any): ModuleWithProviders {
         return {

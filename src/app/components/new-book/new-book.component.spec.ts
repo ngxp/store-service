@@ -14,7 +14,7 @@ describe('NewBookComponent', () => {
         TestBed.configureTestingModule({
             imports: [
                 AppModule,
-                NgrxStoreServiceTestingModule.withState(null)
+                NgrxStoreServiceTestingModule
             ],
             providers: [
                 {
