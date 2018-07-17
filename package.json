@@ -5,6 +5,7 @@
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",
+    "test": "ng test",
     "test:sample": "ng test ngrx-store-service-sample",
     "build:lib": "ng build ngrx-store-service",
     "test:lib": "ng test ngrx-store-service",
