@@ -12,9 +12,11 @@ Adds an abstraction layer between Angular components and the [@ngrx](https://git
 import { Component } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Book } from 'src/app/shared/books/book.model';
-import { AppState } from 'src/app/store/appstate.model'; // So
-import { getAllBooks } from 'src/app/store/books/books.selectors'; // many
-import { AddBookAction } from 'src/app/store/books/books.actions'; // dependencies
+// So many dependencies
+import { Store } from '@ngrx/store'; 
+import { AppState } from 'src/app/store/appstate.model';
+import { getAllBooks } from 'src/app/store/books/books.selectors'; 
+import { AddBookAction } from 'src/app/store/books/books.actions'; 
  
 @Component({
     selector: 'nss-book-list',
@@ -44,8 +46,8 @@ export class BookListComponent {
 ```ts
 import { Component } from '@angular/core';
 import { Observable } from 'rxjs';
-import { BookStoreService } from 'src/app/shared/books/book-store.service';
 import { Book } from 'src/app/shared/books/book.model';
+import { BookStoreService } from 'src/app/shared/books/book-store.service'; // <- Reduced to just one dependency
 
 @Component({
     selector: 'nss-book-list',
@@ -90,6 +92,78 @@ export class BookStoreService extends StoreServiceClass<State> {
 }
 ```
 
+## StoreServiceClass
+
+The `StoreService` Injectable class should extend the `StoreServiceClass<State>` class where `State` is your ngrx state model.
+
+## Selectors
+
+To use selectors you have to use the `@Selector(...)` decorator inside the `StoreService`. Add the selector function inside the `@Selector(...)` annotation:
+
+```ts
+// Define the selector function
+export function selectAllBooks() {
+    return state => state.books;
+}
+
+...
+
+// Use the selector function inside the @Selector(...) annotation
+@Selector(selectAllBooks)
+allBooks: () => Observable<Book[]>;
+```
+The selector needs to be a __function__.
+
+Be sure to use correct typing for the property inside the `StoreService`. If a parameter is needed inside the selector function it also has to be defined in the property typing.
+
+```ts
+export function selectBookById(id: number) {
+                              ^^^^^^^^^^^^
+    return state => state.books[id];
+}
+
+...
+
+@Selector(selectBookById)
+getBook: (id: number) => Observable<Book>;
+         ^^^^^^^^^^^^
+// The typing of the selector function and the property have to match!
+```
+
+## Actions
+
+To dispatch actions a similar approach as mentioned in the selectors is used. Add a property with the `@Action(...)` annotation.
+
+```ts
+// Defined the Action as a class
+export class LoadBooksAction implements Action {
+    public type = '[Books] Load books';
+}
+
+...
+// Use the Action class inside the @Action(...) annotation
+@Action(LoadBooksAction)
+loadBooks: () => void;
+```
+
+If the Action class expects parameters the typings on the property inside the `StoreService` have to match the class constructor.
+
+```ts
+export class AddBookAction implements Action {
+    public type = '[Books] Add book';
+    constructor(
+        public payload: Book
+               ^^^^^^^^^^^^^
+    ) {}
+}
+
+...
+@Action(AddBookAction)
+addBook: (book: Book) => void;
+         ^^^^^^^^^^^^
+// The typing of the action constructor and the property have to match!
+```
+
 # Prerequisites
 
 ## Selectors need to be functions
@@ -106,7 +180,20 @@ function selector() {
 }
 ```
 
-Otherwise the typing of the StoreService Class won't work: `() => Observable<Book[]>`
+Otherwise the typing of the StoreService Class won't work: `() => Observable<any>`
+
+## Actions need to be classes
+
+```ts
+export class LoadAction implements Action {
+    public type: 'Load action';
+    constructor(
+        public payload: any
+    ) { }
+}
+```
+
+The actions are instantiated using the `new` keyword.
 
 # Testing
 
@@ -117,6 +204,8 @@ Simply provide the `StoreService` using the `provideStoreServiceMock` method. Th
 
 
 ```ts
+import { provideStoreServiceMock, StoreServiceMock } from 'ngrx-store-service/testing';
+...
 let bookStoreService: StoreServiceMock<BookStoreService>;
 ...
 TestBed.configureTestingModule({
@@ -143,9 +232,11 @@ To emit a new list of books to the components observable. Super easy testing.
 
 To test if a component dispatches actions import the `NgrxStoreServiceTestingModule` inside your Testing Module.
 
-To get the injected Store instace the store instance using the `MockStore` class to get the correct typings.
+To get the injected Store instance use the `MockStore` class to get the correct typings.
 
 ```ts
+import { NgrxStoreServiceTestingModule, MockStore } from 'ngrx-store-service/testing';
+...
 let mockStore: MockStore;
 ...
 TestBed.configureTestingModule({
