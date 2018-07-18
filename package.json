@@ -8,7 +8,9 @@
         "test": "ng test",
         "test:sample": "ng test @ngx-patterns/store-service-sample",
         "build:lib": "ng build @ngx-patterns/store-service",
+        "build-ci:lib": "ng build @ngx-patterns/store-service --prod",
         "test:lib": "ng test @ngx-patterns/store-service",
+        "test-ci:lib": "ng test @ngx-patterns/store-service --watch=false --browsers=ChromeHeadless",
         "lint": "ng lint",
         "e2e": "ng e2e"
     },

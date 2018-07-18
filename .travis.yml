@@ -5,8 +5,8 @@ language: node_js
 node_js:
 - node
 script:
-- npm run test:lib
-- npm run build:lib
+- npm run test-ci:lib
+- npm run build-ci:lib
 before_deploy:
 - cp README.md dist/@ngx-patterns/store-service/README.md
 - cd dist/@ngx-patterns/store-service
@@ -19,3 +19,6 @@ deploy:
   on:
     tags: true
     repo: ngx-patterns/store-service
+notifications:
+  slack:
+    secure: JpMN1C+MOqalshAFV9cTDOA4h1OSc2kmUNs0hhHK7WiSJMUdX/gz4wlCV7wFgPa8btwhb8qw81f2KU/o/p47d20OlU+TS56KJdn2T/FegqW+XfTxjLABVqSg2NQRbGTKH1MzVs3CODYXKssVvoULa8kUX85jaS0asJdFNj6NdS8N3EI78tMnxa253MZG2vWPe1x5l9kX+pwRyNO0lHC4mLgntWqHrqde4CsyEtN5LkmnnJLRoudYSq71vjum4aachsMIpJONEI6O5mgemaRUhuVJsPP0ahKdrag2WfPnUTkDWqYQdfIWWpkCchPdgYVO/zICmYG3ilM4cDB10f2zX87VRUvUiK1ADQoEZJa2PR+nZZsVVx3FOqWLRt+NmOrgw5a5eELwsOx9uIH2LO5/QTepT+jKGjizCFtyjxIG6KASsSj+gwUBfntFw476IPVL1W9JzxjAl3Lg945Jn/30QGUZRenwrc+hDoTxNKYsfl6y46/WzeSpK3JJ0sMldLcd+D1sXp/c3difmvtLPaFgtjz09EkBNDtK0DxeAv4ZMmeaiLNcUjfHPpNkmoW4L58DVADtOJYkWq/MeNmAo0zYtpkFAalvmTcILGbC6MD2Z4Yf09SXUyZJSSUjewhKEe+FeSGGr8QcGrG2o/cq++VZAwasv1lTamUqKBbnD0d4img=
