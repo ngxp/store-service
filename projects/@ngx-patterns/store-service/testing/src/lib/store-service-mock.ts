@@ -24,18 +24,22 @@ export function createStoreServiceMock<T>(
     const store = new MockStore(null);
     const service = new serviceClass(store);
 
-    Object.keys(serviceClass.prototype)
-        .filter(key => serviceClass.prototype[STORE_SERVICE_SELECTORS].includes(key))
-        .forEach(key => {
-            const initialValue = initialValues[key] ? initialValues[key] : undefined;
-            const subject = new BehaviorSubject(initialValue);
-            Object.defineProperty(service, key, {
-                get: () => () => subject,
-                set: () => { },
-                configurable: true,
-                enumerable: true
+    const selectors = serviceClass.prototype[STORE_SERVICE_SELECTORS];
+
+    if (Array.isArray(selectors)) {
+        Object.keys(serviceClass.prototype)
+            .filter(key => selectors.includes(key))
+            .forEach(key => {
+                const initialValue = initialValues[key] ? initialValues[key] : undefined;
+                const subject = new BehaviorSubject(initialValue);
+                Object.defineProperty(service, key, {
+                    get: () => () => subject,
+                    set: () => { },
+                    configurable: true,
+                    enumerable: true
+                });
             });
-        });
+    }
 
     const serviceMock: StoreServiceMock<T> & T = <any> service;
     return serviceMock;
