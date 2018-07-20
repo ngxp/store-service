@@ -19,7 +19,7 @@ export type StoreServiceMock<T> = {
 export function createStoreServiceMock<T>(
     serviceClass: Type<T>,
     initialValues: { [P in keyof T]?: any } = {}
-): StoreServiceMock<T> {
+): StoreServiceMock<T> & T {
 
     const store = new MockStore(null);
     const service = new serviceClass(store);
@@ -37,7 +37,7 @@ export function createStoreServiceMock<T>(
             });
         });
 
-    const serviceMock: StoreServiceMock<T> = <any> service;
+    const serviceMock: StoreServiceMock<T> & T = <any> service;
     return serviceMock;
 }
 
