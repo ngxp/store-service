@@ -1,6 +1,7 @@
 import { Type } from '@angular/core';
 import { MockStore } from './mock-store';
 import { BehaviorSubject } from 'rxjs';
+import { ValueProvider } from '@angular/core';
 
 // Needed because otherwise the build would fail.
 export const STORE_SERVICE_SELECTORS = '__STORE_SERVICE_SELECTORS';
@@ -38,4 +39,14 @@ export function createStoreServiceMock<T>(
 
     const serviceMock: StoreServiceMock<T> = <any> service;
     return serviceMock;
+}
+
+export function provideStoreServiceMock<T>(
+    serviceClass: Type<T>,
+    initialValues: { [P in keyof T]?: any } = {}
+): ValueProvider {
+    return                 {
+        provide: serviceClass,
+        useValue: createStoreServiceMock(serviceClass, initialValues)
+    };
 }
