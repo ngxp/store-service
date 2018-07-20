@@ -1,5 +1,5 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { NgrxStoreServiceTestingModule, provideStoreServiceMock, StoreServiceMock, MockStore } from '@ngx-patterns/store-service/testing';
+import { NgrxStoreServiceTestingModule, createStoreServiceMock, StoreServiceMock, MockStore } from '@ngx-patterns/store-service/testing';
 import { AppModule } from 'src/app/app.module';
 import { getBook } from 'src/test/books';
 import { NewBookComponent } from './new-book.component';
@@ -19,7 +19,7 @@ describe('NewBookComponent', () => {
             providers: [
                 {
                     provide: BookStoreService,
-                    useValue: provideStoreServiceMock(BookStoreService)
+                    useValue: createStoreServiceMock(BookStoreService)
                 }
             ]
         })

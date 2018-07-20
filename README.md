@@ -245,11 +245,11 @@ Testing your components and the StoreService is made easy. The `@ngx-patterns/st
 
 ## Selectors
 
-To test selectors you provide the `StoreService` using the `provideStoreServiceMock` method in the testing module of your component. Then cast the store service instance using the `StoreServiceMock<T>` class to get the correct typings.
+To test selectors you provide the `StoreService` using the `createStoreServiceMock` method in the testing module of your component. Then cast the store service instance using the `StoreServiceMock<T>` class to get the correct typings.
 
 
 ```ts
-import { provideStoreServiceMock, StoreServiceMock } from '@ngx-patterns/store-service/testing';
+import { createStoreServiceMock, StoreServiceMock } from '@ngx-patterns/store-service/testing';
 ...
 let bookStoreService: StoreServiceMock<BookStoreService>;
 ...
@@ -258,7 +258,7 @@ TestBed.configureTestingModule({
     providers: [
         {
             provide: BookStoreService,
-            useValue: provideStoreServiceMock(BookStoreService)
+            useValue: createStoreServiceMock(BookStoreService)
         }
     ]
 })
@@ -272,10 +272,10 @@ The `StoreServiceMock` class replaces all selector functions on the store servic
 bookStoreService.getAllBooks().next(newBooks);
 ```
 
-The `BehaviourSubject` is initialized with the value being `undefined`. If you want a custom initial value, the `provideStoreServiceMock` method offers an optional parameter. This is an object of key value pairs where the key is the name of the selector function, e.g. `getAllBooks`.
+The `BehaviourSubject` is initialized with the value being `undefined`. If you want a custom initial value, the `createStoreServiceMock` method offers an optional parameter. This is an object of key value pairs where the key is the name of the selector function, e.g. `getAllBooks`.
 
 ```ts
-import { provideStoreServiceMock, StoreServiceMock } from '@ngx-patterns/store-service/testing';
+import { createStoreServiceMock, StoreServiceMock } from '@ngx-patterns/store-service/testing';
 ...
 let bookStoreService: StoreServiceMock<BookStoreService>;
 ...
@@ -284,7 +284,7 @@ TestBed.configureTestingModule({
     providers: [
         {
             provide: BookStoreService,
-            useValue: provideStoreServiceMock(
+            useValue: createStoreServiceMock(
                 BookStoreService,
                 {
                     getAllBooks: []

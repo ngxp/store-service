@@ -1,8 +1,8 @@
-import { async, TestBed, ComponentFixture } from '@angular/core/testing';
-import { provideStoreServiceMock, StoreServiceMock } from '@ngx-patterns/store-service/testing';
+import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { createStoreServiceMock, StoreServiceMock } from '@ngx-patterns/store-service/testing';
+import { AppComponent } from 'src/app/app.component';
 import { AppModule } from 'src/app/app.module';
 import { BookStoreService } from 'src/app/shared/books/book-store.service';
-import { AppComponent } from './app.component';
 
 describe('AppComponent', () => {
     let fixture: ComponentFixture<AppComponent>;
@@ -17,7 +17,7 @@ describe('AppComponent', () => {
             providers: [
                 {
                     provide: BookStoreService,
-                    useValue: provideStoreServiceMock(BookStoreService)
+                    useValue: createStoreServiceMock(BookStoreService)
                 }
             ]
         }).compileComponents();

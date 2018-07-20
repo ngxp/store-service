@@ -1,49 +1,10 @@
-import { ModuleWithProviders, NgModule, Type } from '@angular/core';
-import { Action, Store } from '@ngrx/store';
-import { BehaviorSubject, of } from 'rxjs';
-import { Observable } from 'rxjs';
+import { Type } from '@angular/core';
+import { MockStore } from './mock-store';
+import { BehaviorSubject } from 'rxjs';
 
 // Needed because otherwise the build would fail.
 export const STORE_SERVICE_SELECTORS = '__STORE_SERVICE_SELECTORS';
 
-export class MockStore {
-
-    dispatchedActions: Action[] = [];
-
-    constructor(
-        private state
-    ) { }
-
-    select(projectionFn: (state: any) => any) {
-        return of(projectionFn(this.state));
-    }
-
-    dispatch(action: Action) {
-        this.dispatchedActions.push(action);
-    }
-}
-
-@NgModule({
-    providers: [
-        {
-            provide: Store,
-            useValue: new MockStore({})
-        }
-    ]
-})
-export class NgrxStoreServiceTestingModule {
-    static withState(state: any): ModuleWithProviders {
-        return {
-            ngModule: NgrxStoreServiceTestingModule,
-            providers: [
-                {
-                    provide: Store,
-                    useValue: new MockStore(state)
-                }
-            ]
-        };
-    }
-}
 // type SelectorMethod<R> = (...args: any[]) => BehaviorSubject<R>;
 // type ActionDispatcherMethod = () => void;
 
@@ -54,9 +15,10 @@ export type StoreServiceMock<T> = {
     [K in keyof T]: (...args) => BehaviorSubject<any>
 };
 
-export function provideStoreServiceMock<T>(
+export function createStoreServiceMock<T>(
     serviceClass: Type<T>,
-    initialValues: { [P in keyof T]?: any } = {}): StoreServiceMock<T> {
+    initialValues: { [P in keyof T]?: any } = {}
+): StoreServiceMock<T> {
 
     const store = new MockStore(null);
     const service = new serviceClass(store);
@@ -73,6 +35,7 @@ export function provideStoreServiceMock<T>(
                 enumerable: true
             });
         });
-    const serviceMock: StoreServiceMock<T> = <any>service;
+
+    const serviceMock: StoreServiceMock<T> = <any> service;
     return serviceMock;
 }
