@@ -2,7 +2,15 @@
 
 Adds an abstraction layer between Angular components and the [@ngrx](https://github.com/ngrx/platform) store. This decouples the components from the store, selectors and actions and makes it easier to test components.
 
-# How to use
+# Install
+
+Get the latest version from NPM
+
+```sh
+npm install @ngx-patterns/store-service
+```
+
+# Comparison
 
 ## Before
 
@@ -12,7 +20,7 @@ Adds an abstraction layer between Angular components and the [@ngrx](https://git
 import { Component } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Book } from 'src/app/shared/books/book.model';
-// So many dependencies
+// Tight coupling to ngrx, state model, selectors and actions
 import { Store } from '@ngrx/store'; 
 import { AppState } from 'src/app/store/appstate.model';
 import { getAllBooks } from 'src/app/store/books/books.selectors'; 
@@ -47,7 +55,7 @@ export class BookListComponent {
 import { Component } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Book } from 'src/app/shared/books/book.model';
-import { BookStoreService } from 'src/app/shared/books/book-store.service'; // <- Reduced to just one dependency
+import { BookStoreService } from 'src/app/shared/books/book-store.service'; // <- Reduced to just one dependency. Loose coupling
 
 @Component({
     selector: 'nss-book-list',
@@ -92,9 +100,21 @@ export class BookStoreService extends StoreService<State> {
 }
 ```
 
+# How to use
+
 ## StoreService
 
 The `BookStoreService` Injectable class should extend the `StoreService<State>` class where `State` is your ngrx state model.
+
+```ts
+import { StoreService } from '@ngx-patterns/store-service';
+import { AppState } from 'app/store/state.model';
+
+@Injectable()
+export class BookStoreService extends StoreService<AppState> {
+    ...
+}
+```
 
 ## Selectors
 
@@ -164,9 +184,34 @@ addBook: (book: Book) => void;
 // The typing of the action constructor and the property have to match!
 ```
 
+## Complete BookStoreService
+The finished `BookStoreService` looks like this:
+```ts
+import { Action, Selector, StoreService } from '@ngx-patterns/store-service';
+import { AppState } from 'app/store/state.model';
+import { selectAllBooks, selectBookById } from 'app/store/books/books.selectors';
+import { LoadBooksAction, AddBookAction } from 'app/store/books/books.actions';
+
+@Injectable()
+export class BookStoreService extends StoreService<AppState> {
+
+    @Selector(selectAllBooks)
+    allBooks: () => Observable<Book[]>;
+
+    @Selector(selectBookById)
+    getBook: (id: number) => Observable<Book>;
+
+    @Action(LoadBooksAction)
+    loadBooks: () => void;
+
+    @Action(AddBookAction)
+    addBook: (book: Book) => void;
+}
+```  
+
 # Prerequisites
 
-## Selectors need to be functions
+## Selectors should be functions
 
 ```ts
 // This will not work
@@ -180,9 +225,9 @@ function selector() {
 }
 ```
 
-Otherwise the typing of the StoreService Class won't work: `() => Observable<any>`
+If the selector is not a function, the typing of the StoreService Class won't work: `() => Observable<any>`
 
-## Actions need to be classes
+## Actions should be classes
 
 ```ts
 export class LoadAction implements Action {
@@ -193,14 +238,14 @@ export class LoadAction implements Action {
 }
 ```
 
-The actions are instantiated using the `new` keyword.
+This is mandatory because the actions are instantiated using the `new` keyword.
 
 # Testing
+Testing your components and the StoreService is made easy. The `@ngx-patterns/store-service/testing` package provides helpful test-helpers to reduce testing friction.
 
 ## Selectors
-Testing is made easy inside your components. You don't need to import the whole `StoreModule.forRoot(...)`.
 
-Simply provide the `StoreService` using the `provideStoreServiceMock` method. Then cast the store service instance using the `StoreServiceMock<T>` class to get the correct typings.
+To test selectors you provide the `StoreService` using the `provideStoreServiceMock` method in the testing module of your component. Then cast the store service instance using the `StoreServiceMock<T>` class to get the correct typings.
 
 
 ```ts
@@ -221,18 +266,44 @@ TestBed.configureTestingModule({
 bookStoreService = TestBed.get(BookStoreService);
 ```
 
-The `StoreServiceMock` class replaces all selector function on the store service class with `BehaviourSubjects`. So now you can do the following:
+The `StoreServiceMock` class replaces all selector functions on the store service class with a `BehaviourSubject`. So now you can do the following to emit new values to the observables:
 
 ```ts
 bookStoreService.getAllBooks().next(newBooks);
 ```
-To emit a new list of books to the components observable. Super easy testing.
+
+The `BehaviourSubject` is initialized with the value being `undefined`. If you want a custom initial value, the `provideStoreServiceMock` method offers an optional parameter. This is an object of key value pairs where the key is the name of the selector function, e.g. `getAllBooks`.
+
+```ts
+import { provideStoreServiceMock, StoreServiceMock } from '@ngx-patterns/store-service/testing';
+...
+let bookStoreService: StoreServiceMock<BookStoreService>;
+...
+TestBed.configureTestingModule({
+    imports: [AppModule],
+    providers: [
+        {
+            provide: BookStoreService,
+            useValue: provideStoreServiceMock(
+                BookStoreService,
+                {
+                    getAllBooks: []
+                }
+            )
+        }
+    ]
+})
+...
+bookStoreService = TestBed.get(BookStoreService);
+```
+
+The `BehaviourSubject` for `getAllBooks` is now initialized with an empty array instead of `undefined`.
 
 ## Actions
 
-To test if a component dispatches actions import the `NgrxStoreServiceTestingModule` inside your Testing Module.
+To test if a component dispatches actions, you import the `NgrxStoreServiceTestingModule` inside the testing module.
 
-To get the injected Store instance use the `MockStore` class to get the correct typings.
+To get the injected Store instance use the `MockStore` class for proper typings.
 
 ```ts
 import { NgrxStoreServiceTestingModule, MockStore } from '@ngx-patterns/store-service/testing';
@@ -248,7 +319,7 @@ TestBed.configureTestingModule({
 mockStore = TestBed.get(Store);
 ```
 
-Optionally use the `withState(...)` function on the `NgrxStoreServiceTestingModule` to provide an object used as the state.
+Optionally use the `withState(...)` function on the `NgrxStoreServiceTestingModule` to provide an object that should be used as the state.
 
 ```ts
 import { NgrxStoreServiceTestingModule} from '@ngx-patterns/store-service/testing';
@@ -264,7 +335,7 @@ TestBed.configureTestingModule({
 })
 ```
 
-The `MockStore` class has a `dispatchedActions` property which is an array of dispatched actions. The last dispatched action is added at the end.
+The `MockStore` class has a `dispatchedActions` property which is an array of all dispatched actions. The last dispatched action is appended at the end.
 
 ```ts
 const lastDispatchedAction = mockStore.dispatchedActions[mockStore.dispatchedActions.length - 1];
@@ -274,9 +345,9 @@ const lastDispatchedAction = mockStore.dispatchedActions[mockStore.dispatchedAct
 const lastDispatchedAction = last(mockStore.dispatchedActions);
 ```
 
-# Example
+# Examples
 
-For and example of all this have a look at the Angular Project in [the src/app folder](src/app).
+For an example of all this have a look at the Angular Project in [the src/app folder](src/app).
 
 ## Store Service
 
