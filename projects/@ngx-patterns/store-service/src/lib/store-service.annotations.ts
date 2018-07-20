@@ -50,10 +50,17 @@ export function Observe(...actionTypes: (string | Type<any>)[]): PropertyDecorat
             return typeof actionType === 'string' ? actionType : (<any> actionType).type as string;
         });
 
-        target[propertyKey] = this.actions.pipe(
-            ofType(...types),
-            map((action: any) => action.payload)
-        );
+        Object.defineProperty(target, propertyKey, {
+            get: function () {
+                return this.actions.pipe(
+                    ofType(...types),
+                    map((action: any) => action.payload)
+                );
+            },
+            set: function () {},
+            enumerable: true,
+            configurable: true
+        });
 
         target[STORE_SERVICE_OBSERVERS] = [
             ...target[STORE_SERVICE_OBSERVERS],
