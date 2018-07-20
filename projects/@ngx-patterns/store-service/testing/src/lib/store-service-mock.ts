@@ -5,6 +5,7 @@ import { ValueProvider } from '@angular/core';
 
 // Needed because otherwise the build would fail.
 export const STORE_SERVICE_SELECTORS = '__STORE_SERVICE_SELECTORS';
+export const STORE_SERVICE_OBSERVERS = '__STORE_SERVICE_OBSERVERS';
 
 // type SelectorMethod<R> = (...args: any[]) => BehaviorSubject<R>;
 // type ActionDispatcherMethod = () => void;
@@ -28,12 +29,29 @@ export function createStoreServiceMock<T>(
 
     if (Array.isArray(selectors)) {
         Object.keys(serviceClass.prototype)
-            .filter(key => selectors.includes(key))
+        .filter(key => selectors.includes(key))
+        .forEach(key => {
+            const initialValue = initialValues[key] ? initialValues[key] : undefined;
+            const subject = new BehaviorSubject(initialValue);
+            Object.defineProperty(service, key, {
+                get: () => () => subject,
+                set: () => { },
+                configurable: true,
+                enumerable: true
+            });
+        });
+    }
+
+    const observers = serviceClass.prototype[STORE_SERVICE_OBSERVERS];
+
+    if (Array.isArray(observers)) {
+        Object.keys(serviceClass.prototype)
+            .filter(key => observers.includes(key))
             .forEach(key => {
                 const initialValue = initialValues[key] ? initialValues[key] : undefined;
                 const subject = new BehaviorSubject(initialValue);
                 Object.defineProperty(service, key, {
-                    get: () => () => subject,
+                    get: () => subject,
                     set: () => { },
                     configurable: true,
                     enumerable: true

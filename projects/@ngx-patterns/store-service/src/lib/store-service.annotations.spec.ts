@@ -1,8 +1,10 @@
 import { Injectable } from '@angular/core';
-import { Action as NgrxAction } from '@ngrx/store';
-import { Observable, of } from 'rxjs';
+import { Actions } from '@ngrx/effects';
+import { Action, Action as NgrxAction } from '@ngrx/store';
+import { Observable, of, Subject } from 'rxjs';
 import { StoreService } from './store-service';
-import { Action, STORE_SERVICE_ACTIONS, STORE_SERVICE_SELECTORS, Selector } from './store-service.annotations';
+import { Dispatch, Select, STORE_SERVICE_ACTIONS, STORE_SERVICE_SELECTORS, Observe } from './store-service.annotations';
+import { take } from 'rxjs/operators';
 
 // Needed because we can't import from testing...
 class MockStore {
@@ -26,6 +28,9 @@ const state = {
     property: 'someProperty'
 };
 
+const entityAddedActionType = 'entityAdded';
+const actionsSubject = new Subject<Action>();
+
 function selectorFn(propName: string) {
     return _state => _state[propName];
 }
@@ -40,11 +45,14 @@ class AddEntityAction implements NgrxAction {
 }
 @Injectable()
 class MockService extends StoreService<any> {
-    @Selector(selectorFn)
+    @Select(selectorFn)
     getStateProp: (propName: string) => Observable<string>;
 
-    @Action(AddEntityAction)
+    @Dispatch(AddEntityAction)
     addEntity: (entity: any) => void;
+
+    @Observe(entityAddedActionType)
+    addedEntitie$: Observable<any>;
 }
 
 describe('Ngrx Store Service Annotations', () => {
@@ -53,10 +61,10 @@ describe('Ngrx Store Service Annotations', () => {
 
     beforeEach(() => {
         store = new MockStore(state);
-        service = new MockService(<any>store);
+        service = new MockService(<any>store, new Actions(actionsSubject));
     });
 
-    describe('Selector', () => {
+    describe('Select', () => {
 
         it('calls select function on the store instance', () => {
             const storeSelectSpy = spyOn(store, 'select').and.callThrough();
@@ -85,7 +93,8 @@ describe('Ngrx Store Service Annotations', () => {
         });
     });
 
-    describe('Action', () => {
+    describe('Dispatch', () => {
+
 
         it('calls dispatch function on the store instance', () => {
             const entity = { name: 'entity' };
@@ -113,5 +122,26 @@ describe('Ngrx Store Service Annotations', () => {
         it('sets the actions variable', () => {
             expect(service[STORE_SERVICE_ACTIONS]).toContain('addEntity');
         });
+    });
+
+    describe('Observe', () => {
+        it('filters actions of type', () => {
+            service.addedEntitie$
+                .pipe(
+                    take(1)
+                )
+                .subscribe(payload => {
+                    expect(payload).toBe(expectedPayload);
+                });
+            const expectedPayload = { value: 'payload' };
+
+            const action = {
+                type: entityAddedActionType,
+                payload: expectedPayload
+            };
+
+            actionsSubject.next(action);
+        });
+
     });
 });
