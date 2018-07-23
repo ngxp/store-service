@@ -142,6 +142,21 @@ describe('Ngrx Store Service Annotations', () => {
 
             actionsSubject.next(action);
         });
+        it('does not emit if type does not match', () => {
+            service.addedEntitie$
+                .pipe(
+                    take(1)
+                )
+                .subscribe(payload => {
+                    fail('Type should not emit');
+                });
+
+            const action = {
+                type: 'wrong type',
+                payload: null
+            };
+            actionsSubject.next(action);
+        });
 
     });
 });

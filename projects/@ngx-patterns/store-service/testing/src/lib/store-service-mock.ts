@@ -1,7 +1,9 @@
 import { Type } from '@angular/core';
 import { MockStore } from './mock-store';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, Subject } from 'rxjs';
 import { ValueProvider } from '@angular/core';
+import { Action } from '@ngrx/store';
+import { Actions } from '@ngrx/effects';
 
 // Needed because otherwise the build would fail.
 export const STORE_SERVICE_SELECTORS = '__STORE_SERVICE_SELECTORS';
@@ -23,7 +25,9 @@ export function createStoreServiceMock<T>(
 ): StoreServiceMock<T> & T {
 
     const store = new MockStore(null);
-    const service = new serviceClass(store);
+    const actionsSubject = new Subject<Action>();
+    const actions = new Actions(actionsSubject);
+    const service = new serviceClass(store, actions);
 
     const selectors = serviceClass.prototype[STORE_SERVICE_SELECTORS];
 
