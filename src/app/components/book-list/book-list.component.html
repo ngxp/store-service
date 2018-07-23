@@ -2,6 +2,13 @@
     <nss-book-list-entry [book]="book"></nss-book-list-entry>
 </div>
 
-<span *ngIf="books$ | async">
+<span *ngIf="!loaded" class="not-loaded">
+    Books are loading
+</span>
+<span *ngIf="loaded" class="loaded">
+    All books loaded
+</span>
+<span *ngIf="books$ | async" class="total">
     {{ (books$ | async).length }} books total
 </span>
+

@@ -1,5 +1,5 @@
 import { async, TestBed } from '@angular/core/testing';
-import { NgrxStoreServiceTestingModule, MockStore } from '@ngx-patterns/store-service/testing';
+import { NgrxStoreServiceTestingModule, MockStore, MockActions } from '@ngx-patterns/store-service/testing';
 import { BookStoreService } from 'src/app/shared/books/book-store.service';
 import { BookModule } from 'src/app/shared/books/book.module';
 import { State } from 'src/app/store/store.model';
@@ -7,11 +7,12 @@ import { getBooks } from 'src/app/store/books/books.selectors';
 import { getBook } from 'src/test/books';
 import { Book } from 'src/app/shared/books/book.model';
 import { Store } from '@ngrx/store';
-import { AddBookAction, ActionTypes } from 'src/app/store/books/books.actions';
+import { AddBookAction, ActionTypes, BooksLoadedAction } from 'src/app/store/books/books.actions';
 
 describe('BookStoreService', () => {
     let bookStoreService: BookStoreService;
     let mockStore: MockStore;
+    let mockActions: MockActions;
     const state: State = {
         books: {
             books: [
@@ -36,6 +37,7 @@ describe('BookStoreService', () => {
     beforeEach(() => {
         bookStoreService = TestBed.get(BookStoreService);
         mockStore = TestBed.get(Store);
+        mockActions = TestBed.get(MockActions);
     });
 
     it('executes the getBooks Selector', () => {
@@ -59,5 +61,21 @@ describe('BookStoreService', () => {
         const action = <AddBookAction> mockStore.dispatchedActions[mockStore.dispatchedActions.length - 1];
 
         expect(action.type).toBe(ActionTypes.LoadBooks);
+    });
+    it('filters the BooksLoadedActions in booksLoaded$', () => {
+        bookStoreService.booksLoaded$.subscribe(
+            books => {
+                expect(books).toBe(expectedValue);
+            }
+        );
+        const expectedValue: Book[] = [{
+            author: 'Author',
+            title: 'Title',
+            year: 2018
+        }];
+
+        const action = new BooksLoadedAction(expectedValue);
+
+        mockActions.next(action);
     });
 });
