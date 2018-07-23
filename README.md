@@ -82,7 +82,7 @@ export class BookListComponent {
 
 ```ts
 import { Injectable } from '@angular/core';
-import { Selector, StoreService, Action } from '@ngx-patterns/store-service';
+import { Select, StoreService, Dispatch } from '@ngx-patterns/store-service';
 import { Observable } from 'rxjs';
 import { Book } from 'src/app/shared/books/book.model';
 import { getBooks } from 'src/app/store/books/books.selectors';
@@ -92,10 +92,10 @@ import { AddBookAction } from 'src/app/store/books/books.actions';
 @Injectable()
 export class BookStoreService extends StoreService<State> {
 
-    @Selector(getBooks) // <- Selector
+    @Select(getBooks) // <- Selector
     getAllBooks: () => Observable<Book[]>;
 
-    @Action(AddBookAction) // <- Action
+    @Dispatch(AddBookAction) // <- Action
     addBook: (book: Book) => void;
 }
 ```
@@ -118,7 +118,7 @@ export class BookStoreService extends StoreService<AppState> {
 
 ## Selectors
 
-To use selectors you have to use the `@Selector(...)` decorator inside the `StoreService`. Add the selector function inside the `@Selector(...)` annotation:
+To use selectors you have to use the `@Select(...)` decorator inside the `StoreService`. Add the selector function inside the `@Select(...)` annotation:
 
 ```ts
 // Define the selector function
@@ -128,8 +128,8 @@ export function selectAllBooks() {
 
 ...
 
-// Use the selector function inside the @Selector(...) annotation
-@Selector(selectAllBooks)
+// Use the selector function inside the @Select(...) annotation
+@Select(selectAllBooks)
 allBooks: () => Observable<Book[]>;
 ```
 The selector needs to be a __function__.
@@ -144,7 +144,7 @@ export function selectBookById(id: number) {
 
 ...
 
-@Selector(selectBookById)
+@Select(selectBookById)
 getBook: (id: number) => Observable<Book>;
          ^^^^^^^^^^^^
 // The typing of the selector function and the property have to match!
@@ -152,7 +152,7 @@ getBook: (id: number) => Observable<Book>;
 
 ## Actions
 
-To dispatch actions a similar approach as mentioned in the selectors is used. Add a property with the `@Action(...)` annotation.
+To dispatch actions a similar approach as mentioned in the selectors is used. Add a property with the `@Dispatch(...)` annotation.
 
 ```ts
 // Defined the Action as a class
@@ -162,7 +162,7 @@ export class LoadBooksAction implements Action {
 
 ...
 // Use the Action class inside the @Action(...) annotation
-@Action(LoadBooksAction)
+@Dispatch(LoadBooksAction)
 loadBooks: () => void;
 ```
 
@@ -178,7 +178,7 @@ export class AddBookAction implements Action {
 }
 
 ...
-@Action(AddBookAction)
+@Dispatch(AddBookAction)
 addBook: (book: Book) => void;
          ^^^^^^^^^^^^
 // The typing of the action constructor and the property have to match!
@@ -187,7 +187,7 @@ addBook: (book: Book) => void;
 ## Complete BookStoreService
 The finished `BookStoreService` looks like this:
 ```ts
-import { Action, Selector, StoreService } from '@ngx-patterns/store-service';
+import { Dispatch, Select, StoreService } from '@ngx-patterns/store-service';
 import { AppState } from 'app/store/state.model';
 import { selectAllBooks, selectBookById } from 'app/store/books/books.selectors';
 import { LoadBooksAction, AddBookAction } from 'app/store/books/books.actions';
@@ -195,16 +195,16 @@ import { LoadBooksAction, AddBookAction } from 'app/store/books/books.actions';
 @Injectable()
 export class BookStoreService extends StoreService<AppState> {
 
-    @Selector(selectAllBooks)
+    @Select(selectAllBooks)
     allBooks: () => Observable<Book[]>;
 
-    @Selector(selectBookById)
+    @Select(selectBookById)
     getBook: (id: number) => Observable<Book>;
 
-    @Action(LoadBooksAction)
+    @Dispatch(LoadBooksAction)
     loadBooks: () => void;
 
-    @Action(AddBookAction)
+    @Dispatch(AddBookAction)
     addBook: (book: Book) => void;
 }
 ```  
