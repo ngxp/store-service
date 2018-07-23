@@ -1,6 +1,6 @@
 # @ngx-patterns/store-service
 
-Adds an abstraction layer between Angular components and the [@ngrx](https://github.com/ngrx/platform) store. This decouples the components from the store, selectors and actions and makes it easier to test components.
+Adds an abstraction layer between Angular components and the [@ngrx](https://github.com/ngrx/platform) store and effects. This decouples the components from the store, selectors, actions and effects and makes it easier to test components.
 
 # Install
 
@@ -97,6 +97,9 @@ export class BookStoreService extends StoreService<State> {
 
     @Dispatch(AddBookAction) // <- Action
     addBook: (book: Book) => void;
+
+    @Observe(Actiontypes.BooksLoaded)
+    booksLoaded$: Observable<Book[]>; // <- Action stream / effects
 }
 ```
 
@@ -184,6 +187,31 @@ addBook: (book: Book) => void;
 // The typing of the action constructor and the property have to match!
 ```
 
+## Observers (from @ngrx/effects)
+
+Observers are a way to listen for specific action types on the `Actions` stream from [@ngrx/effects](https://github.com/ngrx/platform/blob/master/docs/effects/README.md).
+
+```ts
+@Observe(Actiontypes.BooksLoaded)
+booksLoaded$: Observable<Book[]>;
+```
+
+It automatically maps the action to it's payload. The `@Observe(...)` decorator wraps the following functionality:
+
+```ts
+this.actions.pipe(
+    ofType(ActionTypes.BooksLoaded),
+    map(action => action.payload)
+)
+```
+
+You can also provide multiple types, just like on the `ofType(...)` pipe.
+
+```ts
+@Observe(Actiontypes.BooksLoaded, Actiontypes.BookLoadFailed)
+booksLoaded$: Observable<Book[] | string>;
+```
+
 ## Complete BookStoreService
 The finished `BookStoreService` looks like this:
 ```ts
@@ -206,6 +234,9 @@ export class BookStoreService extends StoreService<AppState> {
 
     @Dispatch(AddBookAction)
     addBook: (book: Book) => void;
+
+    @Observe(Actiontypes.BooksLoaded, Actiontypes.BookLoadFailed)
+    booksLoaded$: Observable<Book[] | string>;
 }
 ```  
 
@@ -237,8 +268,12 @@ export class LoadAction implements Action {
     ) { }
 }
 ```
-
 This is mandatory because the actions are instantiated using the `new` keyword.
+
+## Actions should have a `payload` property
+
+To work with the `@Observe(...)` decorator all actions should have a `payload` property. The `@Observe(...)` decorator automatically maps to this property so you don't have to extract it yourself. Other property names will not work.
+
 
 # Testing
 Testing your components and the StoreService is made easy. The `@ngx-patterns/store-service/testing` package provides helpful test-helpers to reduce testing friction.
@@ -336,9 +371,59 @@ const lastDispatchedAction = mockStore.dispatchedActions[mockStore.dispatchedAct
 const lastDispatchedAction = last(mockStore.dispatchedActions);
 ```
 
+## Observers / Actions stream
+
+To test the actions stream, you import the `NgrxStoreServiceTestingModule` inside the testing module.
+
+Get the `MockActions` instance from the `TestBed`
+
+```ts
+import { NgrxStoreServiceTestingModule, MockActions } from '@ngx-patterns/store-service/testing';
+...
+let mockActions: MockActions;
+...
+TestBed.configureTestingModule({
+    imports: [
+        NgrxStoreServiceTestingModule
+    ]
+})
+...
+mockActions = TestBed.get(MockActions);
+```
+
+The `MockActions` class provides a `next(...)` function which will emit a new value to the `Actions` stream from @ngrx/effects.
+This way you can emit new actions to the stream.
+
+Here is an example on how to test this using the `MockActions` class.
+
+```ts
+import { NgrxStoreServiceTestingModule, MockActions } from '@ngx-patterns/store-service/testing';
+...
+let mockActions: MockActions;
+...
+TestBed.configureTestingModule({
+    imports: [
+        NgrxStoreServiceTestingModule
+    ]
+})
+...
+mockActions = TestBed.get(MockActions);
+...
+it('test', () => {
+    const expectedValue = [ { author: 'Author', title: 'Title', year: 2018 } ];
+    storeService.booksLoaded$.subscribe(
+        books => {
+            expect(books).toBe(expectedValue);
+        }
+    );
+    const action = new BooksLoadedAction(expectedValue);
+    mockActions.next(action)
+})
+```
+
 # Examples
 
-For an example of all this have a look at the Angular Project in [the src/app folder](src/app).
+For detailed examples of all this have a look at the Angular Project in [the src/app folder](src/app).
 
 ## Store Service
 
