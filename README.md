@@ -2,7 +2,32 @@
 
 Adds an abstraction layer between Angular components and the [@ngrx](https://github.com/ngrx/platform) store and effects. This decouples the components from the store, selectors, actions and effects and makes it easier to test components.
 
-# Install
+# Table of contents
+
+* [Installation](#Installation)
+* [Comparison](#Comparison)
+    * [Before](#Before)
+    * [After](#After)
+* [Documentation](#Documentation)
+    * [StoreService](#StoreService)
+    * [Selectors](#Selectors)
+    * [Actions](#Actions)
+    * [Observers](#Observers)
+        * [Observe multiple types](#Multiple-types)
+        * [Use objects with type property](#Objects-with-type-property)
+        * [Custom toPayload mapper](#Custom-toPayload-mapper)
+* [Prerequisites](#Prerequisites)
+    * [Selectors are functionss](#Selectors-are-functions)
+    * [Actions are classes](#Actions-are-classes)
+* [Testing](#Testing)
+    * [Testing Selectors](#Testing-Selectors)
+    * [Testing Actions](#Testing-Actions)
+    * [Testing Observers](#Testing-Observers)
+* [Examples](#Examples)
+    * [Example Store Service](#Example-Store-Service)
+    * [Example Tests](#Example-Tests)
+
+# Installation
 
 Get the latest version from NPM
 
@@ -22,9 +47,10 @@ import { Observable } from 'rxjs';
 import { Book } from 'src/app/shared/books/book.model';
 // Tight coupling to ngrx, state model, selectors and actions
 import { Store } from '@ngrx/store'; 
+import { Actions, ofType } from '@ngrx/effects'; 
 import { AppState } from 'src/app/store/appstate.model';
 import { getAllBooks } from 'src/app/store/books/books.selectors'; 
-import { AddBookAction } from 'src/app/store/books/books.actions'; 
+import { ActionTypes, AddBookAction } from 'src/app/store/books/books.actions'; 
  
 @Component({
     selector: 'nss-book-list',
@@ -34,11 +60,19 @@ import { AddBookAction } from 'src/app/store/books/books.actions';
 export class BookListComponent {
 
     books$: Observable<Book[]>;
+    booksLoaded: boolean = false;
 
     constructor(
         private store: Store<AppState>
+        private actions: Actions
     ) {
         this.books$ = this.store.select(getAllBooks());
+        this.actions
+            .pipe(
+                ofType(ActionTypes.BooksLoaded),
+                map(() => this.loaded = true)
+            )
+            .suscribe();
     }
 
     addBook(book: Book) {
@@ -55,7 +89,8 @@ export class BookListComponent {
 import { Component } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Book } from 'src/app/shared/books/book.model';
-import { BookStoreService } from 'src/app/shared/books/book-store.service'; // <- Reduced to just one dependency. Loose coupling
+import { BookStoreService } from 'src/app/shared/books/book-store.service'; 
+// Reduced to just one dependency. Loose coupling
 
 @Component({
     selector: 'nss-book-list',
@@ -65,11 +100,17 @@ import { BookStoreService } from 'src/app/shared/books/book-store.service'; // <
 export class BookListComponent {
 
     books$: Observable<Book[]>;
+    booksLoaded: boolean = false;
 
     constructor(
         private bookStore: BookStoreService // <- StoreService
     ) {
         this.books$ = this.bookStore.getAllBooks(); // <- Selector
+        this.bookStore.booksLoaded$ // <-- Observer / Action stream of type
+            .pipe(
+                map(() => this.loaded = true)
+            )
+            .subscribe();
     }
 
     addBook(book: Book) {
@@ -98,16 +139,16 @@ export class BookStoreService extends StoreService<State> {
     @Dispatch(AddBookAction) // <- Action
     addBook: (book: Book) => void;
 
-    @Observe(Actiontypes.BooksLoaded)
-    booksLoaded$: Observable<Book[]>; // <- Action stream / effects
+    @Observe([Actiontypes.BooksLoaded])
+    booksLoaded$: Observable<Book[]>; // <- Observer / Action stream
 }
 ```
 
-# How to use
+# Documentation
 
 ## StoreService
 
-The `BookStoreService` Injectable class should extend the `StoreService<State>` class where `State` is your ngrx state model.
+The `BookStoreService` Injectable class has to extend the `StoreService<State>` class where `State` is your ngrx state model.
 
 ```ts
 import { StoreService } from '@ngx-patterns/store-service';
@@ -121,7 +162,7 @@ export class BookStoreService extends StoreService<AppState> {
 
 ## Selectors
 
-To use selectors you have to use the `@Select(...)` decorator inside the `StoreService`. Add the selector function inside the `@Select(...)` annotation:
+To use selectors you add the `@Select(...)` decorator inside the `StoreService`. Provide the selector function inside the `@Select(...)` annotation:
 
 ```ts
 // Define the selector function
@@ -137,7 +178,7 @@ allBooks: () => Observable<Book[]>;
 ```
 The selector needs to be a __function__.
 
-Be sure to use correct typing for the property inside the `StoreService`. If a parameter is required inside the selector function it also has to be required in the property typing.
+Be sure to use correct typing for the property inside the `StoreService`. If a parameter is required inside the selector function it has to be required in the property typing.
 
 ```ts
 export function selectBookById(id: number) {
@@ -155,7 +196,7 @@ getBook: (id: number) => Observable<Book>;
 
 ## Actions
 
-To dispatch actions a similar approach as mentioned in the selectors is used. Add a property with the `@Dispatch(...)` annotation.
+To dispatch actions add a property with the `@Dispatch(...)` annotation.
 
 ```ts
 // Defined the Action as a class
@@ -169,7 +210,7 @@ export class LoadBooksAction implements Action {
 loadBooks: () => void;
 ```
 
-If the Action class expects parameters, the typings on the property inside the `StoreService` have to match the class constructor.
+If the Action class expects parameters, the typings on the property inside the `StoreService` have to match the class constructor. Actions are instantiated using the `new` keyword.
 
 ```ts
 export class AddBookAction implements Action {
@@ -187,16 +228,17 @@ addBook: (book: Book) => void;
 // The typing of the action constructor and the property have to match!
 ```
 
-## Observers (from @ngrx/effects)
+## Observers
 
 Observers are a way to listen for specific action types on the `Actions` stream from [@ngrx/effects](https://github.com/ngrx/platform/blob/master/docs/effects/README.md).
 
 ```ts
-@Observe(Actiontypes.BooksLoaded)
+@Observe([Actiontypes.BooksLoaded])
 booksLoaded$: Observable<Book[]>;
 ```
 
-It automatically maps the action to it's payload. The `@Observe(...)` decorator wraps the following functionality:
+It will automatically map the action to it's `payload` property but this can be changed. 
+The `@Observe(...)` decorator wraps the following functionality:
 
 ```ts
 this.actions.pipe(
@@ -205,44 +247,34 @@ this.actions.pipe(
 )
 ```
 
-You can also provide multiple types, just like on the `ofType(...)` pipe.
+### Multiple types
+You can provide multiple types, just like in the `ofType(...)` pipe.
 
 ```ts
-@Observe(Actiontypes.BooksLoaded, Actiontypes.BookLoadFailed)
+@Observe([Actiontypes.BooksLoaded, Actiontypes.BookLoadFailed])
 booksLoaded$: Observable<Book[] | string>;
 ```
 
-## Complete BookStoreService
-The finished `BookStoreService` looks like this:
+### Objects with type property
+Objects with a `type` property are also valid.
+
 ```ts
-import { Dispatch, Select, StoreService } from '@ngx-patterns/store-service';
-import { AppState } from 'app/store/state.model';
-import { selectAllBooks, selectBookById } from 'app/store/books/books.selectors';
-import { LoadBooksAction, AddBookAction } from 'app/store/books/books.actions';
+const action = { type: 'booksLoaded' };
+...
+@Observe([action])
+booksLoaded$: Observable<Book[]>;
+```
 
-@Injectable()
-export class BookStoreService extends StoreService<AppState> {
-
-    @Select(selectAllBooks)
-    allBooks: () => Observable<Book[]>;
-
-    @Select(selectBookById)
-    getBook: (id: number) => Observable<Book>;
-
-    @Dispatch(LoadBooksAction)
-    loadBooks: () => void;
-
-    @Dispatch(AddBookAction)
-    addBook: (book: Book) => void;
-
-    @Observe(Actiontypes.BooksLoaded, Actiontypes.BookLoadFailed)
-    booksLoaded$: Observable<Book[] | string>;
-}
-```  
-
+### Custom toPayload mapper
+The `@Observe(...)` decorator has an additional parameter to provide a custom `toPayload` mapping function.
+Initially this will be:
+```ts
+action => action.payload
+```
+  
 # Prerequisites
 
-## Selectors should be functions
+## Selectors are functions
 
 ```ts
 // This will not work
@@ -258,9 +290,19 @@ function selector() {
 
 If the selector is not a function, the typing of the StoreService Class won't work: `() => Observable<any>`
 
-## Actions should be classes
+## Actions are classes
 
 ```ts
+// This will not work
+export function LoadAction(payload: any) {
+    return {
+        type: 'Load action',
+        payload
+    };
+}
+```
+```ts
+// This works
 export class LoadAction implements Action {
     public type: 'Load action';
     constructor(
@@ -270,15 +312,10 @@ export class LoadAction implements Action {
 ```
 This is mandatory because the actions are instantiated using the `new` keyword.
 
-## Actions should have a `payload` property
-
-To work with the `@Observe(...)` decorator all actions should have a `payload` property. The `@Observe(...)` decorator automatically maps to this property so you don't have to extract it yourself. Other property names will not work.
-
-
 # Testing
 Testing your components and the StoreService is made easy. The `@ngx-patterns/store-service/testing` package provides helpful test-helpers to reduce testing friction.
 
-## Selectors
+## Testing Selectors
 
 To test selectors you provide the `StoreService` using the `provideStoreServiceMock` method in the testing module of your component. Then cast the store service instance using the `StoreServiceMock<T>` class to get the correct typings.
 
@@ -325,7 +362,7 @@ bookStoreService = TestBed.get(BookStoreService);
 
 The `BehaviourSubject` for `getAllBooks` is now initialized with an empty array instead of `undefined`.
 
-## Actions
+## Testing Actions
 
 To test if a component dispatches actions, you import the `NgrxStoreServiceTestingModule` inside the testing module.
 
@@ -371,9 +408,9 @@ const lastDispatchedAction = mockStore.dispatchedActions[mockStore.dispatchedAct
 const lastDispatchedAction = last(mockStore.dispatchedActions);
 ```
 
-## Observers / Actions stream
+## Testing Observers
 
-To test the actions stream, you import the `NgrxStoreServiceTestingModule` inside the testing module.
+To test the observers / actions stream, you import the `NgrxStoreServiceTestingModule` inside the testing module.
 
 Get the `MockActions` instance from the `TestBed`
 
@@ -425,11 +462,11 @@ it('test', () => {
 
 For detailed examples of all this have a look at the Angular Project in [the src/app folder](src/app).
 
-## Store Service
+## Example Store Service
 
 Have a look at the [BookStoreService](src/app/shared/books/book-store.service.ts)
 
-## Testing
+## Example Tests
 
 For examples on Component Tests please have look at the test for the [BookListComponent](src/app/components/book-list/book-list.component.spec.ts) and the [NewBookComponent](src/app/components/new-book/new-book.component.spec.ts)
 
