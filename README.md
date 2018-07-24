@@ -271,6 +271,16 @@ Initially this will be:
 ```ts
 action => action.payload
 ```
+
+To use a custom mapper, provide it as second argument in the `@Observe(...)` annotation.
+
+```ts
+export const toData = action => action.data;
+
+...
+@Observe([ActionTypes.DataLoaded], toData)
+dataLoaded$: Observable<Data>;
+```
   
 # Prerequisites
 
