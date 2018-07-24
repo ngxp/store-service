@@ -40,24 +40,27 @@ export function Dispatch<T>(actionType: Type<T>): PropertyDecorator {
     };
 }
 
-export function Observe(...actionTypes: (string | Type<any>)[]): PropertyDecorator {
+export function Observe(
+    actionTypes: (string | { type: string; [key: string]: any; })[],
+    toPayload: (action) => any = (action: any) => action.payload
+): PropertyDecorator {
     return (target, propertyKey) => {
         if (!Array.isArray(target[STORE_SERVICE_OBSERVERS])) {
             target[STORE_SERVICE_OBSERVERS] = [];
         }
 
         const types = actionTypes.map(actionType => {
-            return typeof actionType === 'string' ? actionType : (<any> actionType).type as string;
+            return typeof actionType === 'string' ? actionType : actionType.type;
         });
 
         Object.defineProperty(target, propertyKey, {
             get: function () {
                 return this.actions.pipe(
                     ofType(...types),
-                    map((action: any) => action.payload)
+                    map(toPayload)
                 );
             },
-            set: function () {},
+            set: function () { },
             enumerable: true,
             configurable: true
         });

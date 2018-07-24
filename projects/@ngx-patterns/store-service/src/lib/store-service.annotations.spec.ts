@@ -29,6 +29,7 @@ const state = {
 };
 
 const entityAddedActionType = 'entityAdded';
+const entityRemovedActionType = 'entityRemoved';
 const actionsSubject = new Subject<Action>();
 
 function selectorFn(propName: string) {
@@ -51,8 +52,11 @@ class MockService extends StoreService<any> {
     @Dispatch(AddEntityAction)
     addEntity: (entity: any) => void;
 
-    @Observe(entityAddedActionType)
+    @Observe([entityAddedActionType, new AddEntityAction({})])
     addedEntitie$: Observable<any>;
+
+    @Observe([entityAddedActionType], action => action.content)
+    addedEntitieWithCustomPayloadMapper$: Observable<any>;
 }
 
 describe('Ngrx Store Service Annotations', () => {
@@ -138,6 +142,40 @@ describe('Ngrx Store Service Annotations', () => {
             const action = {
                 type: entityAddedActionType,
                 payload: expectedPayload
+            };
+
+            actionsSubject.next(action);
+        });
+        it('filters observers with type property', () => {
+            service.addedEntitie$
+                .pipe(
+                    take(1)
+                )
+                .subscribe(payload => {
+                    expect(payload).toBe(expectedPayload);
+                });
+            const expectedPayload = { value: 'payload' };
+
+            const action = {
+                type: actionType,
+                payload: expectedPayload
+            };
+
+            actionsSubject.next(action);
+        });
+        it('filters actions of type with custom payload mapper', () => {
+            service.addedEntitieWithCustomPayloadMapper$
+                .pipe(
+                    take(1)
+                )
+                .subscribe(payload => {
+                    expect(payload).toBe(expectedPayload);
+                });
+            const expectedPayload = { value: 'payload' };
+
+            const action = {
+                type: entityAddedActionType,
+                content: expectedPayload
             };
 
             actionsSubject.next(action);

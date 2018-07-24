@@ -18,6 +18,6 @@ export class BookStoreService extends StoreService<State> {
     @Dispatch(LoadBooksAction)
     loadBooks: () => void;
 
-    @Observe(ActionTypes.BooksLoaded)
+    @Observe([ActionTypes.BooksLoaded])
     booksLoaded$: Observable<Book[]>;
 }
