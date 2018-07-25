@@ -17,7 +17,7 @@ Adds an abstraction layer between Angular components and the [@ngrx](https://git
         * [Use objects with type property](#objects-with-type-property)
         * [Custom toPayload mapper](#custom-topayload-mapper)
 * [Prerequisites](#prerequisites)
-    * [Selectors are functionss](#selectors-are-functions)
+    * [Selectors are functions](#selectors-are-functions)
     * [Actions are classes](#actions-are-classes)
 * [Testing](#testing)
     * [Testing Selectors](#testing-selectors)
