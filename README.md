@@ -36,6 +36,7 @@ npm install @ngx-patterns/store-service
 ```
 
 # Comparison
+![Dependency diagram comparison](docs/diagram.png)
 
 ## Before
 
@@ -143,6 +144,7 @@ export class BookStoreService extends StoreService<State> {
     booksLoaded$: Observable<Book[]>; // <- Observer / Action stream
 }
 ```
+
 
 # Documentation
 
