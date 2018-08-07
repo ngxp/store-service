@@ -1,15 +1,15 @@
 import { Injectable } from '@angular/core';
-import { Effect, Actions } from '@ngrx/effects';
-import { ActionTypes, BooksLoadedAction } from 'src/app/store/books/books.actions';
-import { switchMap, map } from 'rxjs/operators';
+import { Actions, Effect, ofType } from '@ngrx/effects';
+import { map, switchMap } from 'rxjs/operators';
 import { BookService } from 'src/app/shared/books/book.service';
+import { ActionTypes, BooksLoadedAction } from 'src/app/store/books/books.actions';
 @Injectable()
 export class BookEffects {
 
     @Effect()
     loadBooks = this.actions
-        .ofType(ActionTypes.LoadBooks)
         .pipe(
+            ofType(ActionTypes.LoadBooks),
             switchMap(() => {
                 return this.bookService.loadBooks()
                     .pipe(
