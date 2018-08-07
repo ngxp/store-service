@@ -29,10 +29,17 @@ Adds an abstraction layer between Angular components and the [@ngrx](https://git
 
 # Installation
 
-Get the latest version from NPM
+Get the latest version from NPM 
+> The current version requires Angular 6.1
 
 ```sh
 npm install @ngx-patterns/store-service
+```
+
+> If you use Angular 6.0 please use version 3.0.0
+
+```sh
+npm install @ngx-patterns/store-service@3.0.0
 ```
 
 # Comparison
