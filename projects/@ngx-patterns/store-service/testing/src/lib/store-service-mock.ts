@@ -1,22 +1,22 @@
-import { Type } from '@angular/core';
-import { MockStore } from './mock-store';
-import { BehaviorSubject, Subject } from 'rxjs';
-import { ValueProvider } from '@angular/core';
-import { Action } from '@ngrx/store';
+import { Type, ValueProvider } from '@angular/core';
 import { Actions } from '@ngrx/effects';
+import { Action } from '@ngrx/store';
+import { BehaviorSubject, Observable, Subject } from 'rxjs';
+import { MockStore } from './mock-store';
 
 // Needed because otherwise the build would fail.
 export const STORE_SERVICE_SELECTORS = '__STORE_SERVICE_SELECTORS';
 export const STORE_SERVICE_OBSERVERS = '__STORE_SERVICE_OBSERVERS';
 
-// type SelectorMethod<R> = (...args: any[]) => BehaviorSubject<R>;
-// type ActionDispatcherMethod = () => void;
+type SelectorMethod<R> = (...args: any[]) => BehaviorSubject<R>;
+type ActionDispatcherMethod = () => void;
+type ObserverMethod<U> = BehaviorSubject<U>;
 
 export type StoreServiceMock<T> = {
-    // [K in keyof T]: T[K] extends (...args: any[]) => Observable<infer R> ? SelectorMethod<R> : ActionDispatcherMethod
-    // Uncomment when conditional types work in Angular
-    // https://github.com/angular/angular/issues/23779
-    [K in keyof T]: (...args) => BehaviorSubject<any>
+    [K in keyof T]: T[K] extends (...args: any[]) => Observable<infer R> ? SelectorMethod<R> :
+                    T[K] extends (...args: any[]) => void ? ActionDispatcherMethod :
+                    T[K] extends Observable<infer U> ? ObserverMethod<U> :
+                    T[K]
 };
 
 export function createStoreServiceMock<T>(
