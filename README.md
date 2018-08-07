@@ -23,6 +23,8 @@ Adds an abstraction layer between Angular components and the [@ngrx](https://git
     * [Testing Selectors](#testing-selectors)
     * [Testing Actions](#testing-actions)
     * [Testing Observers](#testing-observers)
+        * [StoreServiceMock](#storeservicemock)
+        * [MockActions](#mockactions)
 * [Examples](#examples)
     * [Example Store Service](#example-store-service)
     * [Example Tests](#example-tests)
@@ -354,13 +356,13 @@ TestBed.configureTestingModule({
 bookStoreService = TestBed.get(BookStoreService);
 ```
 
-The `StoreServiceMock` class replaces all selector functions on the store service class with a `BehaviourSubject`. So now you can do the following to emit new values to the observables:
+The `StoreServiceMock` class replaces all selector functions on the store service class with a `BehaviorSubject`. So now you can do the following to emit new values to the observables:
 
 ```ts
 bookStoreService.getAllBooks().next(newBooks);
 ```
 
-The `BehaviourSubject` is initialized with the value being `undefined`. If you want a custom initial value, the `provideStoreServiceMock` method offers an optional parameter. This is an object of key value pairs where the key is the name of the selector function, e.g. `getAllBooks`.
+The `BehaviorSubject` is initialized with the value being `undefined`. If you want a custom initial value, the `provideStoreServiceMock` method offers an optional parameter. This is an object of key value pairs where the key is the name of the selector function, e.g. `getAllBooks`.
 
 ```ts
 import { provideStoreServiceMock, StoreServiceMock } from '@ngx-patterns/store-service/testing';
@@ -379,7 +381,7 @@ TestBed.configureTestingModule({
 bookStoreService = TestBed.get(BookStoreService);
 ```
 
-The `BehaviourSubject` for `getAllBooks` is now initialized with an empty array instead of `undefined`.
+The `BehaviorSubject` for `getAllBooks` is now initialized with an empty array instead of `undefined`.
 
 ## Testing Actions
 
@@ -428,6 +430,58 @@ const lastDispatchedAction = last(mockStore.dispatchedActions);
 ```
 
 ## Testing Observers
+
+There are two different ways to test Observers depending on what you want to test. You can either use the `StoreServiceMock` or the `MockActions`. The `StoreServiceMock` replaces all Observers inside the `StoreService` with a `BehaviorSubject`. This should be used for component tests. The `MockActions` provide a custom `Actions` subject you can emit new actions to. This should be used to test the `StoreService` itself.
+
+### StoreServiceMock
+
+To test observers inside components you provide the `StoreService` using the `provideStoreServiceMock` method in the testing module of your component. Then cast the store service instance using the `StoreServiceMock<T>` class to get the correct typings.
+
+
+```ts
+import { provideStoreServiceMock, StoreServiceMock } from '@ngx-patterns/store-service/testing';
+...
+let bookStoreService: StoreServiceMock<BookStoreService>;
+...
+TestBed.configureTestingModule({
+    imports: [AppModule],
+    providers: [
+        provideStoreServiceMock(BookStoreService)
+    ]
+})
+...
+bookStoreService = TestBed.get(BookStoreService);
+```
+
+The `StoreServiceMock` class replaces all observer properties on the store service class with a `BehaviorSubject`. So now you can do the following to emit new values to the subscribers:
+
+```ts
+bookStoreService.booksLoaded$.next(true);
+```
+
+The `BehaviorSubject` is initialized with the value being `undefined`. If you want a custom initial value, the `provideStoreServiceMock` method offers an optional parameter. This is an object of key value pairs where the key is the name of the observer property, e.g. `booksLoaded$`.
+
+```ts
+import { provideStoreServiceMock, StoreServiceMock } from '@ngx-patterns/store-service/testing';
+...
+let bookStoreService: StoreServiceMock<BookStoreService>;
+...
+TestBed.configureTestingModule({
+    imports: [AppModule],
+    providers: [
+        provideStoreServiceMock(BookStoreService, {
+            booksLoaded$: false
+        })
+    ]
+})
+...
+bookStoreService = TestBed.get(BookStoreService);
+```
+
+The `BehaviorSubject` for `booksLoaded$` is now initialized with `false` instead of `undefined`.
+
+
+### MockActions
 
 To test the observers / actions stream, you import the `NgrxStoreServiceTestingModule` inside the testing module.
 
