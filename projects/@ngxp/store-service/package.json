@@ -25,7 +25,7 @@
         "url": "https://github.com/ngxp/store-service/issues"
     },
     "license": "MIT",
-    "version": "4.0.0",
+    "version": "5.0.0",
     "peerDependencies": {
         "@angular/common": "^6.1.1",
         "@angular/core": "^6.1.1",
