@@ -1,5 +1,5 @@
 {
-    "name": "@ngx-patterns/store-service",
+    "name": "@ngxp/store-service",
     "author": {
         "name": "Joost Zöllner",
         "email": "github@joost.io"
@@ -9,7 +9,7 @@
     },
     "repository": {
         "type": "git",
-        "url": "https://github.com/ngx-patterns/store-service"
+        "url": "https://github.com/ngxp/store-service"
     },
     "description": "Adds an abstraction layer / facade between Angular components and the ngrx store with powerful testing helpers",
     "keywords": [
@@ -22,7 +22,7 @@
         "testing"
     ],
     "bugs": {
-        "url": "https://github.com/ngx-patterns/store-service/issues"
+        "url": "https://github.com/ngxp/store-service/issues"
     },
     "license": "MIT",
     "version": "4.0.0",

@@ -17,11 +17,11 @@
       "dom"
     ],
     "paths": {
-      "@ngx-patterns/store-service": [
-        "dist/@ngx-patterns/store-service"
+      "@ngxp/store-service": [
+        "dist/@ngxp/store-service"
       ],
-      "@ngx-patterns/store-service/*": [
-        "dist/@ngx-patterns/store-service/*"
+      "@ngxp/store-service/*": [
+        "dist/@ngxp/store-service/*"
       ]
     }
   }

@@ -1,4 +1,4 @@
-# @ngx-patterns/store-service
+# @ngxp/store-service
 
 Adds an abstraction layer between Angular components and the [@ngrx](https://github.com/ngrx/platform) store and effects. This decouples the components from the store, selectors, actions and effects and makes it easier to test components.
 
@@ -35,13 +35,13 @@ Get the latest version from NPM
 > The current version requires Angular 6.1
 
 ```sh
-npm install @ngx-patterns/store-service
+npm install @ngxp/store-service
 ```
 
 > If you use Angular 6.0 please use version 3.0.0
 
 ```sh
-npm install @ngx-patterns/store-service@3.0.0
+npm install @ngxp/store-service@3.0.0
 ```
 
 # Comparison
@@ -133,7 +133,7 @@ export class BookListComponent {
 
 ```ts
 import { Injectable } from '@angular/core';
-import { Select, StoreService, Dispatch } from '@ngx-patterns/store-service';
+import { Select, StoreService, Dispatch } from '@ngxp/store-service';
 import { Observable } from 'rxjs';
 import { Book } from 'src/app/shared/books/book.model';
 import { getBooks } from 'src/app/store/books/books.selectors';
@@ -162,7 +162,7 @@ export class BookStoreService extends StoreService<State> {
 The `BookStoreService` Injectable class has to extend the `StoreService<State>` class where `State` is your ngrx state model.
 
 ```ts
-import { StoreService } from '@ngx-patterns/store-service';
+import { StoreService } from '@ngxp/store-service';
 import { AppState } from 'app/store/state.model';
 
 @Injectable()
@@ -334,7 +334,7 @@ export class LoadAction implements Action {
 This is mandatory because the actions are instantiated using the `new` keyword.
 
 # Testing
-Testing your components and the StoreService is made easy. The `@ngx-patterns/store-service/testing` package provides helpful test-helpers to reduce testing friction.
+Testing your components and the StoreService is made easy. The `@ngxp/store-service/testing` package provides helpful test-helpers to reduce testing friction.
 
 ## Testing Selectors
 
@@ -342,7 +342,7 @@ To test selectors you provide the `StoreService` using the `provideStoreServiceM
 
 
 ```ts
-import { provideStoreServiceMock, StoreServiceMock } from '@ngx-patterns/store-service/testing';
+import { provideStoreServiceMock, StoreServiceMock } from '@ngxp/store-service/testing';
 ...
 let bookStoreService: StoreServiceMock<BookStoreService>;
 ...
@@ -365,7 +365,7 @@ bookStoreService.getAllBooks().next(newBooks);
 The `BehaviorSubject` is initialized with the value being `undefined`. If you want a custom initial value, the `provideStoreServiceMock` method offers an optional parameter. This is an object of key value pairs where the key is the name of the selector function, e.g. `getAllBooks`.
 
 ```ts
-import { provideStoreServiceMock, StoreServiceMock } from '@ngx-patterns/store-service/testing';
+import { provideStoreServiceMock, StoreServiceMock } from '@ngxp/store-service/testing';
 ...
 let bookStoreService: StoreServiceMock<BookStoreService>;
 ...
@@ -390,7 +390,7 @@ To test if a component dispatches actions, you import the `NgrxStoreServiceTesti
 To get the injected Store instance use the `MockStore` class for proper typings.
 
 ```ts
-import { NgrxStoreServiceTestingModule, MockStore } from '@ngx-patterns/store-service/testing';
+import { NgrxStoreServiceTestingModule, MockStore } from '@ngxp/store-service/testing';
 ...
 let mockStore: MockStore;
 ...
@@ -406,7 +406,7 @@ mockStore = TestBed.get(Store);
 Optionally use the `withState(...)` function on the `NgrxStoreServiceTestingModule` to provide an object that should be used as the state.
 
 ```ts
-import { NgrxStoreServiceTestingModule} from '@ngx-patterns/store-service/testing';
+import { NgrxStoreServiceTestingModule} from '@ngxp/store-service/testing';
 ...
 const state = {
     books: []
@@ -439,7 +439,7 @@ To test observers inside components you provide the `StoreService` using the `pr
 
 
 ```ts
-import { provideStoreServiceMock, StoreServiceMock } from '@ngx-patterns/store-service/testing';
+import { provideStoreServiceMock, StoreServiceMock } from '@ngxp/store-service/testing';
 ...
 let bookStoreService: StoreServiceMock<BookStoreService>;
 ...
@@ -462,7 +462,7 @@ bookStoreService.booksLoaded$.next(true);
 The `BehaviorSubject` is initialized with the value being `undefined`. If you want a custom initial value, the `provideStoreServiceMock` method offers an optional parameter. This is an object of key value pairs where the key is the name of the observer property, e.g. `booksLoaded$`.
 
 ```ts
-import { provideStoreServiceMock, StoreServiceMock } from '@ngx-patterns/store-service/testing';
+import { provideStoreServiceMock, StoreServiceMock } from '@ngxp/store-service/testing';
 ...
 let bookStoreService: StoreServiceMock<BookStoreService>;
 ...
@@ -488,7 +488,7 @@ To test the observers / actions stream, you import the `NgrxStoreServiceTestingM
 Get the `MockActions` instance from the `TestBed`
 
 ```ts
-import { NgrxStoreServiceTestingModule, MockActions } from '@ngx-patterns/store-service/testing';
+import { NgrxStoreServiceTestingModule, MockActions } from '@ngxp/store-service/testing';
 ...
 let mockActions: MockActions;
 ...
@@ -507,7 +507,7 @@ This way you can emit new actions to the stream.
 Here is an example on how to test this using the `MockActions` class.
 
 ```ts
-import { NgrxStoreServiceTestingModule, MockActions } from '@ngx-patterns/store-service/testing';
+import { NgrxStoreServiceTestingModule, MockActions } from '@ngxp/store-service/testing';
 ...
 let mockActions: MockActions;
 ...

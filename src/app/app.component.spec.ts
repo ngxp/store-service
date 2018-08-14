@@ -1,5 +1,5 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { provideStoreServiceMock, StoreServiceMock } from '@ngx-patterns/store-service/testing';
+import { provideStoreServiceMock, StoreServiceMock } from '@ngxp/store-service/testing';
 import { AppComponent } from 'src/app/app.component';
 import { AppModule } from 'src/app/app.module';
 import { BookStoreService } from 'src/app/shared/books/book-store.service';

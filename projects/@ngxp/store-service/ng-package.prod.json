@@ -1,7 +1,6 @@
 {
   "$schema": "../../../node_modules/ng-packagr/ng-package.schema.json",
-  "dest": "../../../dist/@ngx-patterns/store-service",
-  "deleteDestPath": false,
+  "dest": "../../../dist/@ngxp/store-service",
   "lib": {
     "entryFile": "src/public_api.ts"
   }
