@@ -21,6 +21,7 @@
         "facade",
         "testing"
     ],
+    "homepage": "https://github.com/ngxp/store-service#readme",
     "bugs": {
         "url": "https://github.com/ngxp/store-service/issues"
     },
