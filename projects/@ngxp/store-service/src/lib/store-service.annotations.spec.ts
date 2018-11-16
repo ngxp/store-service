@@ -1,10 +1,10 @@
 import { Injectable } from '@angular/core';
 import { Actions } from '@ngrx/effects';
-import { Action, Action as NgrxAction } from '@ngrx/store';
+import { Action, Action as NgrxAction, createSelector } from '@ngrx/store';
 import { Observable, of, Subject } from 'rxjs';
-import { StoreService } from './store-service';
-import { Dispatch, Select, STORE_SERVICE_ACTIONS, STORE_SERVICE_SELECTORS, Observe } from './store-service.annotations';
 import { take } from 'rxjs/operators';
+import { StoreService } from './store-service';
+import { Dispatch, Observe, Select, STORE_SERVICE_ACTIONS, STORE_SERVICE_SELECTORS } from './store-service.annotations';
 
 // Needed because we can't import from testing...
 class MockStore {
@@ -15,8 +15,10 @@ class MockStore {
         private _state
     ) { }
 
-    select(projectionFn: (state: any) => any) {
-        return of(projectionFn(this._state));
+    pipe(...operators) {
+        return of(this._state).pipe(
+            ...operators
+        );
     }
 
     dispatch(action: NgrxAction) {
@@ -32,9 +34,9 @@ const entityAddedActionType = 'entityAdded';
 const entityRemovedActionType = 'entityRemoved';
 const actionsSubject = new Subject<Action>();
 
-function selectorFn(propName: string) {
-    return _state => _state[propName];
-}
+const selectorFn = createSelector(
+    (state: any, props: { propName: string }) => state[props.propName]
+)
 
 const actionType = 'someType';
 
@@ -47,7 +49,7 @@ class AddEntityAction implements NgrxAction {
 @Injectable()
 class MockService extends StoreService<any> {
     @Select(selectorFn)
-    getStateProp: (propName: string) => Observable<string>;
+    getStateProp: (props: {propName: string}) => Observable<string>;
 
     @Dispatch(AddEntityAction)
     addEntity: (entity: any) => void;
@@ -71,11 +73,11 @@ describe('Ngrx Store Service Annotations', () => {
     describe('Select', () => {
 
         it('calls select function on the store instance', () => {
-            const storeSelectSpy = spyOn(store, 'select').and.callThrough();
+            const storePipeSpy = spyOn(store, 'pipe').and.callThrough();
 
-            service.getStateProp('property')
+            service.getStateProp({ propName: 'property'})
                 .subscribe(value => {
-                    expect(storeSelectSpy).toHaveBeenCalled();
+                    expect(storePipeSpy).toHaveBeenCalled();
                     expect(value).toBe('someProperty');
                 });
         });
@@ -84,7 +86,7 @@ describe('Ngrx Store Service Annotations', () => {
             const overwrittenValue = 'overwrittenProperty';
             const getStatePropSpy = spyOn(service, 'getStateProp').and.returnValue(of(overwrittenValue));
 
-            service.getStateProp('property')
+            service.getStateProp({propName: 'property'})
                 .subscribe(value => {
                     expect(getStatePropSpy).toHaveBeenCalled();
                     expect(value).toBe(overwrittenValue);

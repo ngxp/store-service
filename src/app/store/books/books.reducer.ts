@@ -1,16 +1,16 @@
-import { Book } from 'src/app/shared/books/book.model';
 import { Action } from '@ngrx/store';
-import { ActionTypes, BooksLoadedAction, AddBookAction } from 'src/app/store/books/books.actions';
+import { Book } from 'src/app/shared/books/book.model';
+import { ActionTypes, AddBookAction, BooksLoadedAction } from 'src/app/store/books/books.actions';
 
-export interface State {
+export interface BookState {
     books: Book[];
 }
 
-const initialState: State = {
+const initialState: BookState = {
     books: []
 };
 
-export function reducer(state: State = initialState, action: Action): State {
+export function bookReducer(state: BookState = initialState, action: Action): BookState {
     switch (action.type) {
         case ActionTypes.BooksLoaded:
             const books = (<BooksLoadedAction>action).payload;

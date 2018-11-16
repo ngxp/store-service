@@ -1,8 +1,8 @@
-import { State } from 'src/app/store/books/books.reducer';
 import * as faker from 'faker';
 import { Book } from 'src/app/shared/books/book.model';
+import { BookState } from '../app/store/books/books.reducer';
 
-const books: State = {
+const books: BookState = {
     books: Array(20).fill(getBook())
 };
 
@@ -14,6 +14,6 @@ export function getBook(): Book {
     };
 }
 
-export function getBooks(): State {
+export function getBooks(): BookState {
     return { ...books };
 }
