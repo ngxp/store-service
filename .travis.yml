@@ -1,25 +1,25 @@
 sudo: required
 addons:
-  chrome: stable
+    chrome: stable
 language: node_js
 node_js:
-- node
+    - "10"
 script:
-- npm run test-ci:lib
-- npm run build-ci:lib
+    - npm run test-ci:lib
+    - npm run build-ci:lib
 before_deploy:
-- cp README.md dist/@ngxp/store-service/README.md
-- cd dist/@ngxp/store-service
+    - cp README.md dist/@ngxp/store-service/README.md
+    - cd dist/@ngxp/store-service
 deploy:
-  provider: npm
-  email: github@joost.io
-  skip_cleanup: true
-  api_key:
-    secure: c+6B6NZQb3bV9UJCtmDJOAKF3O2C6LycrtBKsWDPW3K2GFNF48Ipp11tGKtCSzsg0OE22gR/l1xwV09dbCfrgvYs8F0WUP9y/xJ6PUWQihZD9G0uDTpANNuRM+kw6DU52luYgnlenJa7I9uBbs6uCE9+Ky/5FsbMJfX8y3Y/BTrgQ+jfLImrw9xhjuaEh8L7vhJY3baao30UA94JdtPjeqZHZZZwDt9wn0Ch7FeAo/SPvHI5rLmd3hsSckriKV1niMFKDtGJSye0yeZhpnGw5fn8feGxOdnrQUYu4nU/QGrvFIMGIORRLx+TcI7gSL+W9Y5lDh0FNhlqxo22scmXjCDjieQcHC7J+0GfayW+dRXuOBRtZXlmv20DWmxAYi7bssqbps6dGVNU4zZ08qUTOOot47C3qNvL2jlHmOyqQ3JpRopbEe7mD7N8VAmhun/n4Rq5Cc1aAAcbjig82T+RjBmrmu6p1oSZx4MQaRAkcTq8eIdoPxm+/dCea34lzDNR9djwWPHYgl/rrXTqzkUikqtxwECsqN28FdPlU0Yj5w61x1aDJtvFsYpuQo7gv8x6JSj02lLXD3qi0TLBSsUkP0O97I3shM/m+qgU1/HtAUwZMNoAip0WiZIVXb4ds7gFjP8mbcxR5ob2AhpLCGVh0egkrEb8LB3WOnxQjp2Kwhg=
-  on:
-    tags: true
-    repo: ngxp/store-service
+    provider: npm
+    email: github@joost.io
+    skip_cleanup: true
+    api_key:
+        secure: c+6B6NZQb3bV9UJCtmDJOAKF3O2C6LycrtBKsWDPW3K2GFNF48Ipp11tGKtCSzsg0OE22gR/l1xwV09dbCfrgvYs8F0WUP9y/xJ6PUWQihZD9G0uDTpANNuRM+kw6DU52luYgnlenJa7I9uBbs6uCE9+Ky/5FsbMJfX8y3Y/BTrgQ+jfLImrw9xhjuaEh8L7vhJY3baao30UA94JdtPjeqZHZZZwDt9wn0Ch7FeAo/SPvHI5rLmd3hsSckriKV1niMFKDtGJSye0yeZhpnGw5fn8feGxOdnrQUYu4nU/QGrvFIMGIORRLx+TcI7gSL+W9Y5lDh0FNhlqxo22scmXjCDjieQcHC7J+0GfayW+dRXuOBRtZXlmv20DWmxAYi7bssqbps6dGVNU4zZ08qUTOOot47C3qNvL2jlHmOyqQ3JpRopbEe7mD7N8VAmhun/n4Rq5Cc1aAAcbjig82T+RjBmrmu6p1oSZx4MQaRAkcTq8eIdoPxm+/dCea34lzDNR9djwWPHYgl/rrXTqzkUikqtxwECsqN28FdPlU0Yj5w61x1aDJtvFsYpuQo7gv8x6JSj02lLXD3qi0TLBSsUkP0O97I3shM/m+qgU1/HtAUwZMNoAip0WiZIVXb4ds7gFjP8mbcxR5ob2AhpLCGVh0egkrEb8LB3WOnxQjp2Kwhg=
+    on:
+        tags: true
+        repo: ngxp/store-service
 notifications:
-  slack:
-    rooms:
-      secure: QRIE65zL684SRrIzgiF5tpWzOiJHasRgbMvtG19tMoNpYDfO7/dMX2zNL5pxcVBxSEOMLYLu59bHH+cNDPigugPpjXMCp3hcoQAuO85kD476IwBi4HGxL2mW6JUhKjnPnMYDRDLTBkPt4/tJhF5F3YQ/b83W8ytQFEUnTmCOnuKLyaa/Y8kIAW+f+di9+4PXeBu/BCUCQkgI+FD46FzkKv6LJP1tXVKTJn4GObJX/Jz6Dsxkyzi68eM+j3lr1CAFiU8G75SwiN0GvycQnO5e6G9+OUTjCKk8EEW6n89PArqstw2E/Qtq9lmGnGuu4v39U03Kgi3sllfN/VBWXcmomiCuQWmyzPsDTUB2CWkRSaRcUk7BXphO/fAP5ZVfe2V12hVYddLa2emiu3ZVOrv9lKpyvN9DcRhHhWWyCaevC+EPn28b4UIvd/Tv3lGCh9giF4OgK4xRBQg9pbVaM9FLDpNYDep6lsd/jANAnPbdcS6MicipVXspOj3iPkziV2iTY8j3YonbJmUhJnXIjW0+avKITLwUpNckiwaEwbu3IGvyQgF0VmQXshjckwGHMYO5igOxHIsnduT+UzqK0WryP03BnVzHo+kWoV+CV8miKFdsEv5420iSIg+Wh7kowHIY2d1D39nefxqxexoiTc2eyfgh2Cuy+/9kycbHqCCo6Mc=
+    slack:
+        rooms:
+            secure: QRIE65zL684SRrIzgiF5tpWzOiJHasRgbMvtG19tMoNpYDfO7/dMX2zNL5pxcVBxSEOMLYLu59bHH+cNDPigugPpjXMCp3hcoQAuO85kD476IwBi4HGxL2mW6JUhKjnPnMYDRDLTBkPt4/tJhF5F3YQ/b83W8ytQFEUnTmCOnuKLyaa/Y8kIAW+f+di9+4PXeBu/BCUCQkgI+FD46FzkKv6LJP1tXVKTJn4GObJX/Jz6Dsxkyzi68eM+j3lr1CAFiU8G75SwiN0GvycQnO5e6G9+OUTjCKk8EEW6n89PArqstw2E/Qtq9lmGnGuu4v39U03Kgi3sllfN/VBWXcmomiCuQWmyzPsDTUB2CWkRSaRcUk7BXphO/fAP5ZVfe2V12hVYddLa2emiu3ZVOrv9lKpyvN9DcRhHhWWyCaevC+EPn28b4UIvd/Tv3lGCh9giF4OgK4xRBQg9pbVaM9FLDpNYDep6lsd/jANAnPbdcS6MicipVXspOj3iPkziV2iTY8j3YonbJmUhJnXIjW0+avKITLwUpNckiwaEwbu3IGvyQgF0VmQXshjckwGHMYO5igOxHIsnduT+UzqK0WryP03BnVzHo+kWoV+CV8miKFdsEv5420iSIg+Wh7kowHIY2d1D39nefxqxexoiTc2eyfgh2Cuy+/9kycbHqCCo6Mc=
