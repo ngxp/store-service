@@ -1,4 +1,4 @@
-import { Subject } from 'node_modules/rxjs';
+import { Subject } from 'rxjs';
 import { Actions } from '@ngrx/effects';
 
 export class MockActions {
