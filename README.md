@@ -2,6 +2,10 @@
 
 Adds an abstraction layer between Angular components and the [@ngrx](https://github.com/ngrx/platform) store and effects. This decouples the components from the store, selectors, actions and effects and makes it easier to test components.
 
+> Version 6+ and onward uses the ngrx `createSelector` function.
+
+> Previous version <= 5 use pure functions. This version can be found [here](https://github.com/ngxp/store-service/tree/v5.0.2)
+
 # Table of contents
 
 * [Installation](#installation)
