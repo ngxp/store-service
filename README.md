@@ -56,10 +56,10 @@ import { Component } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Book } from 'src/app/shared/books/book.model';
 // Tight coupling to ngrx, state model, selectors and actions
-import { Store } from '@ngrx/store'; 
+import { Store, select } from '@ngrx/store'; 
 import { Actions, ofType } from '@ngrx/effects'; 
 import { AppState } from 'src/app/store/appstate.model';
-import { getAllBooks } from 'src/app/store/books/books.selectors'; 
+import { getAllBooks, getBook } from 'src/app/store/books/books.selectors'; 
 import { ActionTypes, AddBookAction } from 'src/app/store/books/books.actions'; 
  
 @Component({
@@ -70,13 +70,15 @@ import { ActionTypes, AddBookAction } from 'src/app/store/books/books.actions';
 export class BookListComponent {
 
     books$: Observable<Book[]>;
+    book$: Observable<Book>;
     booksLoaded: boolean = false;
 
     constructor(
         private store: Store<AppState>
         private actions: Actions
     ) {
-        this.books$ = this.store.select(getAllBooks());
+        this.books$ = this.store.pipe(select(getAllBooks));
+        this.book$ = this.store.pipe(select(getBook, { id: 0 }));
         this.actions
             .pipe(
                 ofType(ActionTypes.BooksLoaded),
@@ -110,12 +112,14 @@ import { BookStoreService } from 'src/app/shared/books/book-store.service';
 export class BookListComponent {
 
     books$: Observable<Book[]>;
+    book$: Observable<Book>;
     booksLoaded: boolean = false;
 
     constructor(
         private bookStore: BookStoreService // <- StoreService
     ) {
         this.books$ = this.bookStore.getAllBooks(); // <- Selector
+        this.book$ = this.bookStore.getBook({ id: 0 }); // <- Selector
         this.bookStore.booksLoaded$ // <-- Observer / Action stream of type
             .pipe(
                 map(() => this.loaded = true)
@@ -145,6 +149,9 @@ export class BookStoreService extends StoreService<State> {
 
     @Select(getBooks) // <- Selector
     getAllBooks: () => Observable<Book[]>;
+
+    @Select(getBook) // <- Selector
+    getBook: (props: { id: number }) => Observable<Book>;
 
     @Dispatch(AddBookAction) // <- Action
     addBook: (book: Book) => void;
@@ -177,32 +184,37 @@ To use selectors you add the `@Select(...)` decorator inside the `StoreService`.
 
 ```ts
 // Define the selector function
-export function selectAllBooks() {
-    return state => state.books;
-}
+export const selectAllBooks = createSelector(
+    (state: State) => state.books;
+};
 
+//Or with props
+export const selectBook = createSelector(
+    (state: State, props: { id: number }) => state.books[id];
+};
 ...
 
 // Use the selector function inside the @Select(...) annotation
 @Select(selectAllBooks)
 allBooks: () => Observable<Book[]>;
-```
-The selector needs to be a __function__.
 
-Be sure to use correct typing for the property inside the `StoreService`. If a parameter is required inside the selector function it has to be required in the property typing.
+@Select(selectBook)
+book: (props: { id: number }) => Observable<Book>;
+```
+Be sure to use correct typing for the property inside the `StoreService`. If you want to use props inside the selector function they have to be required in the property typing.
 
 ```ts
-export function selectBookById(id: number) {
-                              ^^^^^^^^^^^^
-    return state => state.books[id];
-}
+export const selectBook = createSelector(
+    (state: State, props: { id: number }) => state.books[id];
+                   ^^^^^^^^^^^^^^^^^^^^^^  
+};
 
 ...
 
 @Select(selectBookById)
-getBook: (id: number) => Observable<Book>;
-         ^^^^^^^^^^^^
-// The typing of the selector function and the property have to match!
+getBook: (props: { id: number }) => Observable<Book>;
+         ^^^^^^^^^^^^^^^^^^^^^^
+// The typing of the props parameters have to match!
 ```
 
 ## Actions
@@ -295,21 +307,20 @@ dataLoaded$: Observable<Data>;
   
 # Prerequisites
 
-## Selectors are functions
+## Use props for parameters in selectors
+
+The `StoreService` uses the suggested way of passing props to selectors as defined by the NgRx team.
+So you need to create your selectors accordingly.
+
 
 ```ts
-// This will not work
-const selector = state => state.property;
-```
+export const selectoFn = createSelector(
+    selectFeature,
+    (state: FeatureState, props: { propA: number, propB: string }) => { ... }
+)
 
-```ts
-// This works
-function selector() {
-    return state => state.property;
-}
+this.store.pipe(select(selectorFn, { propA: 0, propB: 'a'}))
 ```
-
-If the selector is not a function, the typing of the StoreService Class won't work: `() => Observable<any>`
 
 ## Actions are classes
 

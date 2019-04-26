@@ -1,7 +1,7 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { RouterTestingModule } from '@angular/router/testing';
 import { provideStoreServiceMock, StoreServiceMock } from '@ngxp/store-service/testing';
 import { AppComponent } from 'src/app/app.component';
-import { AppModule } from 'src/app/app.module';
 import { BookStoreService } from 'src/app/shared/books/book-store.service';
 
 describe('AppComponent', () => {
@@ -12,7 +12,10 @@ describe('AppComponent', () => {
     beforeEach(async(() => {
         TestBed.configureTestingModule({
             imports: [
-                AppModule
+                RouterTestingModule
+            ],
+            declarations: [
+                AppComponent,
             ],
             providers: [
                 provideStoreServiceMock(BookStoreService)

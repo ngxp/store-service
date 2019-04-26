@@ -1,19 +1,18 @@
 import { async, TestBed } from '@angular/core/testing';
-import { NgrxStoreServiceTestingModule, MockStore, MockActions } from '@ngxp/store-service/testing';
-import { BookStoreService } from 'src/app/shared/books/book-store.service';
-import { BookModule } from 'src/app/shared/books/book.module';
-import { State } from 'src/app/store/store.model';
-import { getBooks } from 'src/app/store/books/books.selectors';
-import { getBook } from 'src/test/books';
-import { Book } from 'src/app/shared/books/book.model';
 import { Store } from '@ngrx/store';
-import { AddBookAction, ActionTypes, BooksLoadedAction } from 'src/app/store/books/books.actions';
+import { MockActions, MockStore, NgrxStoreServiceTestingModule } from '@ngxp/store-service/testing';
+import { BookStoreService } from 'src/app/shared/books/book-store.service';
+import { Book } from 'src/app/shared/books/book.model';
+import { ActionTypes, AddBookAction, BooksLoadedAction } from 'src/app/store/books/books.actions';
+import { getBook } from 'src/test/books';
+import { BookState } from '../../store/books/books.reducer';
+import { selectBook, selectBooks } from '../../store/books/books.selectors';
 
 describe('BookStoreService', () => {
     let bookStoreService: BookStoreService;
     let mockStore: MockStore;
     let mockActions: MockActions;
-    const state: State = {
+    const state: { books: BookState } = {
         books: {
             books: [
                 {
@@ -28,8 +27,10 @@ describe('BookStoreService', () => {
     beforeEach(async(() => {
         TestBed.configureTestingModule({
             imports: [
-                BookModule,
                 NgrxStoreServiceTestingModule.withState(state)
+            ],
+            providers: [
+                BookStoreService
             ]
         });
     }));
@@ -43,7 +44,13 @@ describe('BookStoreService', () => {
     it('executes the getBooks Selector', () => {
         bookStoreService.getAllBooks()
             .subscribe(books => {
-                expect(books).toBe(getBooks()(state));
+                expect(books).toBe(selectBooks(state));
+            });
+    });
+    it('executes the getBook Selector', () => {
+        bookStoreService.getBook({ id: 0 })
+            .subscribe(books => {
+                expect(books).toBe(selectBook(state, { id: 0 }));
             });
     });
     it('dispatches a new AddBookAction', () => {

@@ -1,5 +1,5 @@
 import { Action } from '@ngrx/store';
-import { Observable, of } from 'rxjs';
+import { of } from 'rxjs';
 
 export class MockStore {
 
@@ -9,8 +9,10 @@ export class MockStore {
         private state
     ) { }
 
-    select<T, R>(projectionFn: (state: T) => R): Observable<R> {
-        return of(projectionFn(this.state));
+    pipe(...operators) {
+        return of(this.state).pipe(
+            ...operators
+        );
     }
 
     dispatch(action: Action) {

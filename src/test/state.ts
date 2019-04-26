@@ -1,10 +1,9 @@
-import { State } from 'src/app/store/store.model';
 import { getBooks } from 'src/test/books';
 
-const state: State = {
+const state: any = {
     books: getBooks()
 };
 
-export function getState(): State {
+export function getState(): any {
     return { ...state };
 }

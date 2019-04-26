@@ -1,5 +1,7 @@
-<div *ngFor="let book of (books$ | async)">
-    <nss-book-list-entry [book]="book"></nss-book-list-entry>
+<nss-new-book></nss-new-book>
+
+<div *ngFor="let book of (books$ | async); let i = index">
+    <nss-book-list-entry [book]="book" [routerLink]="i"></nss-book-list-entry>
 </div>
 
 <span *ngIf="!loaded" class="not-loaded">
