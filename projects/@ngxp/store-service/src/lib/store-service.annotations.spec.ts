@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
 import { Actions } from '@ngrx/effects';
 import { Action, Action as NgrxAction, createSelector } from '@ngrx/store';
-import { Observable, of, Subject } from 'rxjs';
+import { Observable, of, OperatorFunction, Subject } from 'rxjs';
+import { pipeFromArray } from 'rxjs/internal/util/pipe';
 import { take } from 'rxjs/operators';
 import { StoreService } from './store-service';
 import { Dispatch, Observe, Select, STORE_SERVICE_ACTIONS, STORE_SERVICE_SELECTORS } from './store-service.annotations';
@@ -15,10 +16,10 @@ class MockStore {
         private _state
     ) { }
 
-    pipe(...operators) {
-        return of(this._state).pipe(
-            ...operators
-        );
+    // Spreading operators into the pipe function from rxjs does not work anymore
+    // See: https://github.com/ReactiveX/rxjs/issues/3989
+    pipe(...operators: OperatorFunction<any, any>[]) {
+        return pipeFromArray(operators)(of(this._state));
     }
 
     dispatch(action: NgrxAction) {
@@ -35,8 +36,9 @@ const entityRemovedActionType = 'entityRemoved';
 const actionsSubject = new Subject<Action>();
 
 const selectorFn = createSelector(
-    (state: any, props: { propName: string }) => state[props.propName]
-)
+    (_state: any) => _state,
+    (_state: any, props: { propName: string }) => _state[props.propName]
+);
 
 const actionType = 'someType';
 
@@ -49,7 +51,7 @@ class AddEntityAction implements NgrxAction {
 @Injectable()
 class MockService extends StoreService<any> {
     @Select(selectorFn)
-    getStateProp: (props: {propName: string}) => Observable<string>;
+    getStateProp: (props: { propName: string }) => Observable<string>;
 
     @Dispatch(AddEntityAction)
     addEntity: (entity: any) => void;
@@ -75,7 +77,7 @@ describe('Ngrx Store Service Annotations', () => {
         it('calls select function on the store instance', () => {
             const storePipeSpy = spyOn(store, 'pipe').and.callThrough();
 
-            service.getStateProp({ propName: 'property'})
+            service.getStateProp({ propName: 'property' })
                 .subscribe(value => {
                     expect(storePipeSpy).toHaveBeenCalled();
                     expect(value).toBe('someProperty');
@@ -86,7 +88,7 @@ describe('Ngrx Store Service Annotations', () => {
             const overwrittenValue = 'overwrittenProperty';
             const getStatePropSpy = spyOn(service, 'getStateProp').and.returnValue(of(overwrittenValue));
 
-            service.getStateProp({propName: 'property'})
+            service.getStateProp({ propName: 'property' })
                 .subscribe(value => {
                     expect(getStatePropSpy).toHaveBeenCalled();
                     expect(value).toBe(overwrittenValue);
@@ -132,6 +134,7 @@ describe('Ngrx Store Service Annotations', () => {
 
     describe('Observe', () => {
         it('filters actions of type', () => {
+            const expectedPayload = { value: 'payload' };
             service.addedEntitie$
                 .pipe(
                     take(1)
@@ -139,7 +142,6 @@ describe('Ngrx Store Service Annotations', () => {
                 .subscribe(payload => {
                     expect(payload).toBe(expectedPayload);
                 });
-            const expectedPayload = { value: 'payload' };
 
             const action = {
                 type: entityAddedActionType,
@@ -149,6 +151,7 @@ describe('Ngrx Store Service Annotations', () => {
             actionsSubject.next(action);
         });
         it('filters observers with type property', () => {
+            const expectedPayload = { value: 'payload' };
             service.addedEntitie$
                 .pipe(
                     take(1)
@@ -156,7 +159,6 @@ describe('Ngrx Store Service Annotations', () => {
                 .subscribe(payload => {
                     expect(payload).toBe(expectedPayload);
                 });
-            const expectedPayload = { value: 'payload' };
 
             const action = {
                 type: actionType,
@@ -166,6 +168,7 @@ describe('Ngrx Store Service Annotations', () => {
             actionsSubject.next(action);
         });
         it('filters actions of type with custom payload mapper', () => {
+            const expectedPayload = { value: 'payload' };
             service.addedEntitieWithCustomPayloadMapper$
                 .pipe(
                     take(1)
@@ -173,7 +176,6 @@ describe('Ngrx Store Service Annotations', () => {
                 .subscribe(payload => {
                     expect(payload).toBe(expectedPayload);
                 });
-            const expectedPayload = { value: 'payload' };
 
             const action = {
                 type: entityAddedActionType,
