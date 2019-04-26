@@ -1,5 +1,6 @@
 import { Action } from '@ngrx/store';
-import { of } from 'rxjs';
+import { of, OperatorFunction } from 'rxjs';
+import { pipeFromArray } from 'rxjs/internal/util/pipe';
 
 export class MockStore {
 
@@ -9,10 +10,10 @@ export class MockStore {
         private state
     ) { }
 
-    pipe(...operators) {
-        return of(this.state).pipe(
-            ...operators
-        );
+    // Spreading operators into the pipe function from rxjs does not work anymore
+    // See: https://github.com/ReactiveX/rxjs/issues/3989
+    pipe(...operators: OperatorFunction<any, any>[]) {
+        return pipeFromArray(operators)(of(this.state));
     }
 
     dispatch(action: Action) {
