@@ -1,9 +1,9 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { NgrxStoreServiceTestingModule, provideStoreServiceMock, StoreServiceMock, MockStore } from '@ngxp/store-service/testing';
+import { provideStoreServiceMock, StoreServiceMock } from '@ngxp/store-service/testing';
 import { AppModule } from 'src/app/app.module';
+import { BookStoreService } from 'src/app/shared/books/book-store.service';
 import { getBook } from 'src/test/books';
 import { NewBookComponent } from './new-book.component';
-import { BookStoreService } from 'src/app/shared/books/book-store.service';
 
 describe('NewBookComponent', () => {
     let component: NewBookComponent;
@@ -13,8 +13,7 @@ describe('NewBookComponent', () => {
     beforeEach(async(() => {
         TestBed.configureTestingModule({
             imports: [
-                AppModule,
-                NgrxStoreServiceTestingModule
+                AppModule
             ],
             providers: [
                 provideStoreServiceMock(BookStoreService)
@@ -40,6 +39,6 @@ describe('NewBookComponent', () => {
 
         component.addBook(new Event('submit'));
 
-        expect(addBookSpy).toHaveBeenCalledWith(book);
+        expect(addBookSpy).toHaveBeenCalledWith({ book });
     });
 });

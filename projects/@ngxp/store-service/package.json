@@ -28,10 +28,10 @@
     "license": "MIT",
     "version": "6.1.0",
     "peerDependencies": {
-        "@angular/common": "^6.1.1",
-        "@angular/core": "^6.1.1",
-        "@ngrx/effects": "^6.1.0",
-        "@ngrx/store": "^6.1.0",
-        "rxjs": "^6.2.2"
+        "@angular/common": "^8.0.2",
+        "@angular/core": "^8.0.2",
+        "@ngrx/effects": "^8.0.1",
+        "@ngrx/store": "^8.0.1",
+        "rxjs": "^6.5.2"
     }
 }

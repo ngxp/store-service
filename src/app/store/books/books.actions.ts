@@ -1,28 +1,14 @@
-import { Action } from '@ngrx/store';
+import { createAction, props } from '@ngrx/store';
 import { Book } from 'src/app/shared/books/book.model';
 
-export enum ActionTypes {
-    LoadBooks = '[Books] Load books',
-    BooksLoaded = '[Books] Books loaded',
-    AddBook = '[Books] Add book'
-}
+export const loadBooksAction = createAction('[Books] Load books');
 
-export class LoadBooksAction implements Action {
-    public type = ActionTypes.LoadBooks;
-}
+export const booksLoadedAction = createAction(
+    '[Books] Books loaded',
+    props<{ books: Book[] }>()
+);
 
-export class BooksLoadedAction implements Action {
-    public type = ActionTypes.BooksLoaded;
-
-    constructor(
-        public payload: Book[]
-    ) {}
-}
-
-export class AddBookAction implements Action {
-    public type = ActionTypes.AddBook;
-
-    constructor(
-        public payload: Book
-    ) {}
-}
+export const addBookAction = createAction(
+    '[Books] Add book',
+    props<{ book: Book }>()
+);

@@ -1,9 +1,9 @@
-import { LoadBooksAction, BooksLoadedAction } from 'src/app/store/books/books.actions';
-import { cold } from 'jasmine-marbles';
-import { BookEffects } from 'src/app/store/books/book.effects';
 import { Actions } from '@ngrx/effects';
+import { cold } from 'jasmine-marbles';
 import { BookService } from 'src/app/shared/books/book.service';
+import { BookEffects } from 'src/app/store/books/book.effects';
 import { getBooks } from 'src/test/books';
+import { booksLoadedAction, loadBooksAction } from './books.actions';
 
 describe('BookEffects', () => {
     const service = new BookService();
@@ -11,7 +11,7 @@ describe('BookEffects', () => {
 
     describe('loadBooks', () => {
         it('loads the books via service', () => {
-            const source = cold('a', { a: new LoadBooksAction() });
+            const source = cold('a', { a: loadBooksAction() });
 
             const loadBooksSpy = spyOn(service, 'loadBooks').and.callThrough();
 
@@ -23,11 +23,11 @@ describe('BookEffects', () => {
                 });
         });
         it('dispatches a BooksLoadedAction', () => {
-            const source = cold('a', { a: new LoadBooksAction() });
+            const source = cold('a', { a: loadBooksAction() });
             const bookServiceReturn = cold('a', { a: books });
             spyOn(service, 'loadBooks').and.returnValue(bookServiceReturn);
 
-            const expected = cold('a', { a: new BooksLoadedAction(books) });
+            const expected = cold('a', { a: booksLoadedAction({ books }) });
 
             const effects = new BookEffects(new Actions(source), service);
 

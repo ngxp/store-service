@@ -1,8 +1,7 @@
-import { Type, ValueProvider } from '@angular/core';
+import { FactoryProvider, Type } from '@angular/core';
 import { Actions } from '@ngrx/effects';
-import { Action } from '@ngrx/store';
-import { BehaviorSubject, Observable, Subject } from 'rxjs';
-import { MockStore } from './mock-store';
+import { Action, Store } from '@ngrx/store';
+import { BehaviorSubject, Observable } from 'rxjs';
 
 // Needed because otherwise the build would fail.
 export const STORE_SERVICE_SELECTORS = '__STORE_SERVICE_SELECTORS';
@@ -14,65 +13,64 @@ type ObserverMethod<U> = BehaviorSubject<U>;
 
 export type StoreServiceMock<T> = {
     [K in keyof T]: T[K] extends (...args: any[]) => Observable<infer R> ? SelectorMethod<R> :
-                    T[K] extends (...args: any[]) => void ? ActionDispatcherMethod :
-                    T[K] extends Observable<infer U> ? ObserverMethod<U> :
-                    T[K]
+    T[K] extends (...args: any[]) => void ? ActionDispatcherMethod :
+    T[K] extends Observable<infer U> ? ObserverMethod<U> :
+    T[K]
 };
 
-export function createStoreServiceMock<T>(
+export function createStoreServiceMockFactory<T, S = any>(
     serviceClass: Type<T>,
     initialValues: { [P in keyof T]?: any } = {}
-): StoreServiceMock<T> & T {
+): (store: Store<S>, actions: Action) => StoreServiceMock<T> & T {
+    return (store, actions) => {
+        const service = new serviceClass(store, actions);
 
-    const store = new MockStore(null);
-    const actionsSubject = new Subject<Action>();
-    const actions = new Actions(actionsSubject);
-    const service = new serviceClass(store, actions);
+        const selectors = serviceClass.prototype[STORE_SERVICE_SELECTORS];
 
-    const selectors = serviceClass.prototype[STORE_SERVICE_SELECTORS];
-
-    if (Array.isArray(selectors)) {
-        Object.keys(serviceClass.prototype)
-        .filter(key => selectors.includes(key))
-        .forEach(key => {
-            const initialValue = initialValues[key] ? initialValues[key] : undefined;
-            const subject = new BehaviorSubject(initialValue);
-            Object.defineProperty(service, key, {
-                get: () => () => subject,
-                set: () => { },
-                configurable: true,
-                enumerable: true
-            });
-        });
-    }
-
-    const observers = serviceClass.prototype[STORE_SERVICE_OBSERVERS];
-
-    if (Array.isArray(observers)) {
-        Object.keys(serviceClass.prototype)
-            .filter(key => observers.includes(key))
-            .forEach(key => {
-                const initialValue = initialValues[key] ? initialValues[key] : undefined;
-                const subject = new BehaviorSubject(initialValue);
-                Object.defineProperty(service, key, {
-                    get: () => subject,
-                    set: () => { },
-                    configurable: true,
-                    enumerable: true
+        if (Array.isArray(selectors)) {
+            Object.keys(serviceClass.prototype)
+                .filter(key => selectors.includes(key))
+                .forEach(key => {
+                    const initialValue = initialValues[key] ? initialValues[key] : undefined;
+                    const subject = new BehaviorSubject(initialValue);
+                    Object.defineProperty(service, key, {
+                        get: () => () => subject,
+                        set: () => { },
+                        configurable: true,
+                        enumerable: true
+                    });
                 });
-            });
-    }
+        }
 
-    const serviceMock: StoreServiceMock<T> & T = <any> service;
-    return serviceMock;
+        const observers = serviceClass.prototype[STORE_SERVICE_OBSERVERS];
+
+        if (Array.isArray(observers)) {
+            Object.keys(serviceClass.prototype)
+                .filter(key => observers.includes(key))
+                .forEach(key => {
+                    const initialValue = initialValues[key] ? initialValues[key] : undefined;
+                    const subject = new BehaviorSubject(initialValue);
+                    Object.defineProperty(service, key, {
+                        get: () => subject,
+                        set: () => { },
+                        configurable: true,
+                        enumerable: true
+                    });
+                });
+        }
+
+        const serviceMock: StoreServiceMock<T> & T = <any>service;
+        return serviceMock;
+    };
 }
 
 export function provideStoreServiceMock<T>(
     serviceClass: Type<T>,
     initialValues: { [P in keyof T]?: any } = {}
-): ValueProvider {
-    return                 {
+): FactoryProvider {
+    return {
         provide: serviceClass,
-        useValue: createStoreServiceMock(serviceClass, initialValues)
+        useFactory: createStoreServiceMockFactory(serviceClass, initialValues),
+        deps: [Store, Actions]
     };
 }
