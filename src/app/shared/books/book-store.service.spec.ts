@@ -15,27 +15,32 @@ describe('BookStoreService', () => {
     let bookStoreService: BookStoreService;
     let mockStore: MockStore<{ books: BookState }>;
     const mockActions = new BehaviorSubject(undefined);
-    const state: { books: BookState } = {
-        books: {
-            books: [
-                {
-                    author: 'Author',
-                    title: 'Title',
-                    year: 2018
-                }
-            ]
+
+    const books: Book[] = [
+        {
+            author: 'Joost',
+            title: 'Testing the StoreService',
+            year: 2019
         }
-    };
+    ];
 
     beforeEach(async(() => {
         TestBed.configureTestingModule({
             providers: [
                 BookStoreService,
                 provideMockStore({
-                    initialState: state
+                    selectors: [
+                        {
+                            selector: selectBooks,
+                            value: books
+                        },
+                        {
+                            selector: selectBook,
+                            value: books[0]
+                        }
+                    ]
                 }),
                 provideMockActions(mockActions)
-
             ]
         });
     }));
@@ -46,12 +51,12 @@ describe('BookStoreService', () => {
     });
 
     it('executes the getBooks Selector', () => {
-        const expected = cold('a', { a: selectBooks(state) });
+        const expected = cold('a', { a: books });
 
         expect(bookStoreService.getAllBooks()).toBeObservable(expected);
     });
     it('executes the getBook Selector', () => {
-        const expected = cold('a', { a: selectBook(state, { id: 0 }) });
+        const expected = cold('a', { a: books[0] });
 
         expect(bookStoreService.getBook({ id: 0 })).toBeObservable(expected);
     });
@@ -78,7 +83,7 @@ describe('BookStoreService', () => {
         const action = booksLoadedAction({ books: expectedValue });
         mockActions.next(action);
 
-        const expected = cold('a', { a: action });
+        const expected = cold('a', { a: action.books });
         expect(bookStoreService.booksLoaded$).toBeObservable(expected);
     });
 });

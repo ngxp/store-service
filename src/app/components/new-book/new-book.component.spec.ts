@@ -35,7 +35,7 @@ describe('NewBookComponent', () => {
     it('dispatches an AddBookAction onAddBook', () => {
         const book = getBook();
         component.book = book;
-        const addBookSpy = spyOn(bookStoreService, 'addBook').and.callThrough();
+        const addBookSpy = spyOn(bookStoreService, 'addBook');
 
         component.addBook(new Event('submit'));
 
