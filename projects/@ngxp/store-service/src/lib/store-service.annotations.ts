@@ -1,6 +1,5 @@
-import { Type } from '@angular/core';
 import { ofType } from '@ngrx/effects';
-import { select } from '@ngrx/store';
+import { ActionCreator, Creator } from '@ngrx/store';
 import { map } from 'rxjs/operators';
 
 export const STORE_SERVICE_SELECTORS = '__STORE_SERVICE_SELECTORS';
@@ -17,7 +16,7 @@ export function Select<S, P, R>(selectorFn: Selector<S, R> | SelectorWithProps<S
         }
 
         target[propertyKey] = function (props?: any) {
-            return this.store.pipe(select(selectorFn, props));
+            return this.store.select(selectorFn, props);
         };
 
         target[STORE_SERVICE_SELECTORS] = [
@@ -27,14 +26,14 @@ export function Select<S, P, R>(selectorFn: Selector<S, R> | SelectorWithProps<S
     };
 }
 
-export function Dispatch<T>(actionType: Type<T>): PropertyDecorator {
+export function Dispatch<T extends string, C extends Creator>(actionCreator: ActionCreator<T, C>): PropertyDecorator {
     return (target, propertyKey) => {
         if (!Array.isArray(target[STORE_SERVICE_ACTIONS])) {
             target[STORE_SERVICE_ACTIONS] = [];
         }
 
         target[propertyKey] = function (...args) {
-            return this.store.dispatch(new actionType(...args));
+            return this.store.dispatch(actionCreator(...args));
         };
 
         target[STORE_SERVICE_ACTIONS] = [
@@ -45,15 +44,15 @@ export function Dispatch<T>(actionType: Type<T>): PropertyDecorator {
 }
 
 export function Observe(
-    actionTypes: (string | { type: string; [key: string]: any; })[],
-    toPayload: (action) => any = (action: any) => action.payload
+    actions: (string | ActionCreator)[],
+    customMapper: (action) => any = (action: any) => action
 ): PropertyDecorator {
     return (target, propertyKey) => {
         if (!Array.isArray(target[STORE_SERVICE_OBSERVERS])) {
             target[STORE_SERVICE_OBSERVERS] = [];
         }
 
-        const types = actionTypes.map(actionType => {
+        const types = actions.map(actionType => {
             return typeof actionType === 'string' ? actionType : actionType.type;
         });
 
@@ -61,7 +60,7 @@ export function Observe(
             get: function () {
                 return this.actions.pipe(
                     ofType(...types),
-                    map(toPayload)
+                    map(customMapper)
                 );
             },
             set: function () { },

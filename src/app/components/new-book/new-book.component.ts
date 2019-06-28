@@ -1,7 +1,6 @@
 import { Component } from '@angular/core';
-import { Book } from 'src/app/shared/books/book.model';
 import { BookStoreService } from 'src/app/shared/books/book-store.service';
-import { AddBookAction } from 'src/app/store/books/books.actions';
+import { Book } from 'src/app/shared/books/book.model';
 
 @Component({
     selector: 'nss-new-book',
@@ -18,11 +17,11 @@ export class NewBookComponent {
 
     constructor(
         private bookStore: BookStoreService
-    ) {}
+    ) { }
 
     addBook(event: Event) {
         event.preventDefault();
-        this.bookStore.addBook(this.book);
+        this.bookStore.addBook({ book: this.book });
         this.resetForm();
     }
 

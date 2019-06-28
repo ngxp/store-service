@@ -2,10 +2,6 @@
 
 Adds an abstraction layer between Angular components and the [@ngrx](https://github.com/ngrx/platform) store and effects. This decouples the components from the store, selectors, actions and effects and makes it easier to test components.
 
-> Version 6+ and onward uses the ngrx `createSelector` function.
-
-> Previous version <= 5 use pure functions. This version can be found [here](https://github.com/ngxp/store-service/tree/v5.0.2)
-
 # Table of contents
 
 * [Installation](#installation)
@@ -19,16 +15,16 @@ Adds an abstraction layer between Angular components and the [@ngrx](https://git
     * [Observers](#observers)
         * [Observe multiple types](#multiple-types)
         * [Use objects with type property](#objects-with-type-property)
-        * [Custom toPayload mapper](#custom-topayload-mapper)
-* [Prerequisites](#prerequisites)
-    * [Selectors are functions](#selectors-are-functions)
-    * [Actions are classes](#actions-are-classes)
+        * [Custom mapper](#custom-mapper)
 * [Testing](#testing)
-    * [Testing Selectors](#testing-selectors)
-    * [Testing Actions](#testing-actions)
-    * [Testing Observers](#testing-observers)
-        * [StoreServiceMock](#storeservicemock)
-        * [MockActions](#mockactions)
+    * [Testing Components](#testing-components)
+        * [Testing Selectors](#testing-selectors)
+        * [Testing Actions](#testing-actions)
+        * [Testing Observers](#testing-observers)
+    * [Testing StoreService](#testing-storeservice)
+        * [Testing StoreService Selectors](#testing-storeservice-selectors)
+        * [Testing StoreService Actions](#testing-storeservice-actions)
+        * [Testing StoreService Observers](#testing-storeservice-observers)
 * [Examples](#examples)
     * [Example Store Service](#example-store-service)
     * [Example Tests](#example-tests)
@@ -36,16 +32,10 @@ Adds an abstraction layer between Angular components and the [@ngrx](https://git
 # Installation
 
 Get the latest version from NPM 
-> The current version requires Angular 6.1
+> The current version requires Angular 8 & Ngrx 8
 
 ```sh
 npm install @ngxp/store-service
-```
-
-> If you use Angular 6.0 please use version 3.0.0
-
-```sh
-npm install @ngxp/store-service@3.0.0
 ```
 
 # Comparison
@@ -60,11 +50,11 @@ import { Component } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Book } from 'src/app/shared/books/book.model';
 // Tight coupling to ngrx, state model, selectors and actions
-import { Store, select } from '@ngrx/store'; 
+import { Store } from '@ngrx/store'; 
 import { Actions, ofType } from '@ngrx/effects'; 
 import { AppState } from 'src/app/store/appstate.model';
 import { getAllBooks, getBook } from 'src/app/store/books/books.selectors'; 
-import { ActionTypes, AddBookAction } from 'src/app/store/books/books.actions'; 
+import { addBookAction, booksLoadedAction } from 'src/app/store/books/books.actions'; 
  
 @Component({
     selector: 'nss-book-list',
@@ -81,18 +71,18 @@ export class BookListComponent {
         private store: Store<AppState>
         private actions: Actions
     ) {
-        this.books$ = this.store.pipe(select(getAllBooks));
-        this.book$ = this.store.pipe(select(getBook, { id: 0 }));
+        this.books$ = this.store.select(getAllBooks);
+        this.book$ = this.store.select(getBook, { id: 0 });
         this.actions
             .pipe(
-                ofType(ActionTypes.BooksLoaded),
+                ofType(booksLoadedAction),
                 map(() => this.loaded = true)
             )
             .suscribe();
     }
 
     addBook(book: Book) {
-        this.store.dispatch(new AddBookAction(book));
+        this.store.dispatch(addBookAction({ book }));
     }
 }
 ```
@@ -132,7 +122,7 @@ export class BookListComponent {
     }
 
     addBook(book: Book) {
-        this.bookStore.addBook(book); // <- Action
+        this.bookStore.addBook({ book }); // <- Action
     }
 }
 ```
@@ -141,26 +131,26 @@ export class BookListComponent {
 
 ```ts
 import { Injectable } from '@angular/core';
-import { Select, StoreService, Dispatch } from '@ngxp/store-service';
+import { Select, StoreService, Dispatch, Selector, Dispatcher } from '@ngxp/store-service';
 import { Observable } from 'rxjs';
 import { Book } from 'src/app/shared/books/book.model';
 import { getBooks } from 'src/app/store/books/books.selectors';
 import { State } from 'src/app/store/store.model';
-import { AddBookAction } from 'src/app/store/books/books.actions';
+import { addBookAction, booksLoadedAction } from 'src/app/store/books/books.actions';
 
 @Injectable()
 export class BookStoreService extends StoreService<State> {
 
     @Select(getBooks) // <- Selector
-    getAllBooks: () => Observable<Book[]>;
+    getAllBooks: Selector<typeof getBook>;
 
     @Select(getBook) // <- Selector
-    getBook: (props: { id: number }) => Observable<Book>;
+    getBook: Selector<typeof getBook>;
 
-    @Dispatch(AddBookAction) // <- Action
-    addBook: (book: Book) => void;
+    @Dispatch(addBookAction) // <- Action
+    addBook: Dispatcher<typeof addBookAction>;
 
-    @Observe([Actiontypes.BooksLoaded])
+    @Observe([booksLoadedAction])
     booksLoaded$: Observable<Book[]>; // <- Observer / Action stream
 }
 ```
@@ -200,26 +190,15 @@ export const selectBook = createSelector(
 
 // Use the selector function inside the @Select(...) annotation
 @Select(selectAllBooks)
-allBooks: () => Observable<Book[]>;
+allBooks: Selector<typeof selectAllBooks>; // () => Observable<Book[]>
 
 @Select(selectBook)
-book: (props: { id: number }) => Observable<Book>;
+book: Selector<typeof selectBook>; // (props: { id: number }) => Observable<Book>
 ```
-Be sure to use correct typing for the property inside the `StoreService`. If you want to use props inside the selector function they have to be required in the property typing.
+The `Selector<...>` type automatically infers the correct typing according to the props and return type of the selector.
 
-```ts
-export const selectBook = createSelector(
-    (state: State, props: { id: number }) => state.books[id];
-                   ^^^^^^^^^^^^^^^^^^^^^^  
-};
 
-...
 
-@Select(selectBookById)
-getBook: (props: { id: number }) => Observable<Book>;
-         ^^^^^^^^^^^^^^^^^^^^^^
-// The typing of the props parameters have to match!
-```
 
 ## Actions
 
@@ -227,58 +206,35 @@ To dispatch actions add a property with the `@Dispatch(...)` annotation.
 
 ```ts
 // Defined the Action as a class
-export class LoadBooksAction implements Action {
-    public type = '[Books] Load books';
-}
+export const loadBooksAction = createAction('[Books] Load books');
 
+export const addBookAction = createAction('[Books] Add book' props<{ book: Book}>())
 ...
-// Use the Action class inside the @Action(...) annotation
-@Dispatch(LoadBooksAction)
-loadBooks: () => void;
+// Use the Action class inside the @Dispatch(...) annotation
+@Dispatch(loadBooksAction)
+loadBooks: Dispatcher<typeof loadBooksAction>; // () => void
+
+@Dispatch(addBookAction)
+addBook: Dispatcher<typeof addBookAction>; // (props: { book: Book }) => void
 ```
 
-If the Action class expects parameters, the typings on the property inside the `StoreService` have to match the class constructor. Actions are instantiated using the `new` keyword.
+The `Dispatcher<...>` type automatically infers the parameters according to the props of the action.
 
-```ts
-export class AddBookAction implements Action {
-    public type = '[Books] Add book';
-    constructor(
-        public payload: Book
-               ^^^^^^^^^^^^^
-    ) {}
-}
-
-...
-@Dispatch(AddBookAction)
-addBook: (book: Book) => void;
-         ^^^^^^^^^^^^
-// The typing of the action constructor and the property have to match!
-```
 
 ## Observers
 
 Observers are a way to listen for specific action types on the `Actions` stream from [@ngrx/effects](https://github.com/ngrx/platform/blob/master/docs/effects/README.md).
 
 ```ts
-@Observe([Actiontypes.BooksLoaded])
+@Observe([booksLoadedAction])
 booksLoaded$: Observable<Book[]>;
-```
-
-It will automatically map the action to it's `payload` property but this can be changed. 
-The `@Observe(...)` decorator wraps the following functionality:
-
-```ts
-this.actions.pipe(
-    ofType(ActionTypes.BooksLoaded),
-    map(action => action.payload)
-)
 ```
 
 ### Multiple types
 You can provide multiple types, just like in the `ofType(...)` pipe.
 
 ```ts
-@Observe([Actiontypes.BooksLoaded, Actiontypes.BookLoadFailed])
+@Observe([booksLoadedAction, booksLoadFailedAction])
 booksLoaded$: Observable<Book[] | string>;
 ```
 
@@ -292,11 +248,11 @@ const action = { type: 'booksLoaded' };
 booksLoaded$: Observable<Book[]>;
 ```
 
-### Custom toPayload mapper
-The `@Observe(...)` decorator has an additional parameter to provide a custom `toPayload` mapping function.
+### Custom mapper
+The `@Observe(...)` decorator has an additional parameter to provide a custom `customMapper` mapping function.
 Initially this will be:
 ```ts
-action => action.payload
+action => action
 ```
 
 To use a custom mapper, provide it as second argument in the `@Observe(...)` annotation.
@@ -305,53 +261,16 @@ To use a custom mapper, provide it as second argument in the `@Observe(...)` ann
 export const toData = action => action.data;
 
 ...
-@Observe([ActionTypes.DataLoaded], toData)
+@Observe([dataLoadedAction], toData)
 dataLoaded$: Observable<Data>;
 ```
-  
-# Prerequisites
-
-## Use props for parameters in selectors
-
-The `StoreService` uses the suggested way of passing props to selectors as defined by the NgRx team.
-So you need to create your selectors accordingly.
-
-
-```ts
-export const selectoFn = createSelector(
-    selectFeature,
-    (state: FeatureState, props: { propA: number, propB: string }) => { ... }
-)
-
-this.store.pipe(select(selectorFn, { propA: 0, propB: 'a'}))
-```
-
-## Actions are classes
-
-```ts
-// This will not work
-export function LoadAction(payload: any) {
-    return {
-        type: 'Load action',
-        payload
-    };
-}
-```
-```ts
-// This works
-export class LoadAction implements Action {
-    public type: 'Load action';
-    constructor(
-        public payload: any
-    ) { }
-}
-```
-This is mandatory because the actions are instantiated using the `new` keyword.
 
 # Testing
-Testing your components and the StoreService is made easy. The `@ngxp/store-service/testing` package provides helpful test-helpers to reduce testing friction.
+Testing your components and the StoreService is easy. The `@ngxp/store-service/testing` package provides useful test-helpers to reduce testing friction.
 
-## Testing Selectors
+## Testing Components
+
+### Testing Selectors
 
 To test selectors you provide the `StoreService` using the `provideStoreServiceMock` method in the testing module of your component. Then cast the store service instance using the `StoreServiceMock<T>` class to get the correct typings.
 
@@ -362,7 +281,9 @@ import { provideStoreServiceMock, StoreServiceMock } from '@ngxp/store-service/t
 let bookStoreService: StoreServiceMock<BookStoreService>;
 ...
 TestBed.configureTestingModule({
-    imports: [AppModule],
+    declarations: [
+        BookListComponent
+    ],
     providers: [
         provideStoreServiceMock(BookStoreService)
     ]
@@ -385,7 +306,9 @@ import { provideStoreServiceMock, StoreServiceMock } from '@ngxp/store-service/t
 let bookStoreService: StoreServiceMock<BookStoreService>;
 ...
 TestBed.configureTestingModule({
-    imports: [AppModule],
+    declarations: [
+        BookListComponent
+    ],
     providers: [
         provideStoreServiceMock(BookStoreService, {
             getAllBooks: []
@@ -398,57 +321,38 @@ bookStoreService = TestBed.get(BookStoreService);
 
 The `BehaviorSubject` for `getAllBooks` is now initialized with an empty array instead of `undefined`.
 
-## Testing Actions
+### Testing Actions
 
-To test if a component dispatches actions, you import the `NgrxStoreServiceTestingModule` inside the testing module.
+To test if a component calls the dispatch methods you provide the `StoreService` using the `provideStoreServiceMock` method in the testing module of your component. Then cast the store service instance using the `StoreServiceMock<T>` class to get the correct typings.
 
-To get the injected Store instance use the `MockStore` class for proper typings.
+You can then spy on the method as usual.
 
 ```ts
-import { NgrxStoreServiceTestingModule, MockStore } from '@ngxp/store-service/testing';
+import { provideStoreServiceMock, StoreServiceMock } from '@ngxp/store-service/testing';
 ...
-let mockStore: MockStore;
+let bookStoreService: StoreServiceMock<BookStoreService>;
 ...
 TestBed.configureTestingModule({
+    declarations: [
+        NewBookComponent
+    ]
     imports: [
-        NgrxStoreServiceTestingModule
+        provideStoreServiceMock(BookStoreService)
     ]
 })
 ...
-mockStore = TestBed.get(Store);
+it('adds a new book', () => {
+    const book: Book = getBook();
+    const addBookSpy = spyOn(bookStoreService, 'addBook');
+
+    component.book = book;
+    component.addBook();
+
+    expect(addBookSpy).toHaveBeenCalledWith({ book });
+});
 ```
 
-Optionally use the `withState(...)` function on the `NgrxStoreServiceTestingModule` to provide an object that should be used as the state.
-
-```ts
-import { NgrxStoreServiceTestingModule} from '@ngxp/store-service/testing';
-...
-const state = {
-    books: []
-}
-...
-TestBed.configureTestingModule({
-    imports: [
-        NgrxStoreServiceTestingModule.withState(state)
-    ]
-})
-```
-
-The `MockStore` class has a `dispatchedActions` property which is an array of all dispatched actions. The last dispatched action is appended at the end.
-
-```ts
-const lastDispatchedAction = mockStore.dispatchedActions[mockStore.dispatchedActions.length - 1];
-
-// Or with lodash
-
-const lastDispatchedAction = last(mockStore.dispatchedActions);
-```
-
-## Testing Observers
-
-There are two different ways to test Observers depending on what you want to test. You can either use the `StoreServiceMock` or the `MockActions`. The `StoreServiceMock` replaces all Observers inside the `StoreService` with a `BehaviorSubject`. This should be used for component tests. The `MockActions` provide a custom `Actions` subject you can emit new actions to. This should be used to test the `StoreService` itself.
-
-### StoreServiceMock
+### Testing Observers
 
 To test observers inside components you provide the `StoreService` using the `provideStoreServiceMock` method in the testing module of your component. Then cast the store service instance using the `StoreServiceMock<T>` class to get the correct typings.
 
@@ -459,7 +363,9 @@ import { provideStoreServiceMock, StoreServiceMock } from '@ngxp/store-service/t
 let bookStoreService: StoreServiceMock<BookStoreService>;
 ...
 TestBed.configureTestingModule({
-    imports: [AppModule],
+    declarations: [
+        BookListComponent
+    ],
     providers: [
         provideStoreServiceMock(BookStoreService)
     ]
@@ -482,7 +388,9 @@ import { provideStoreServiceMock, StoreServiceMock } from '@ngxp/store-service/t
 let bookStoreService: StoreServiceMock<BookStoreService>;
 ...
 TestBed.configureTestingModule({
-    imports: [AppModule],
+    declarations: [
+        BookListComponent
+    ],
     providers: [
         provideStoreServiceMock(BookStoreService, {
             booksLoaded$: false
@@ -496,54 +404,163 @@ bookStoreService = TestBed.get(BookStoreService);
 The `BehaviorSubject` for `booksLoaded$` is now initialized with `false` instead of `undefined`.
 
 
-### MockActions
+## Testing StoreService
 
-To test the observers / actions stream, you import the `NgrxStoreServiceTestingModule` inside the testing module.
+To test the `StoreService` itself you use the provided test helpers from `@ngrx/store/testing` and `@ngrx/effects/testing`.
 
-Get the `MockActions` instance from the `TestBed`
+### Testing StoreService Selectors
+
+You can provide mocks for selectors with the `provideMockStore` from `@ngrx/store/testing` a. See (@ngrx/store Testing)[https://ngrx.io/guide/store/testing] for their documentation.
+
+Mock the selectors using the `provideMockStore` function and check if the `StoreService` returns an Observable with the mocked value.
 
 ```ts
-import { NgrxStoreServiceTestingModule, MockActions } from '@ngxp/store-service/testing';
-...
-let mockActions: MockActions;
-...
-TestBed.configureTestingModule({
-    imports: [
-        NgrxStoreServiceTestingModule
-    ]
-})
-...
-mockActions = TestBed.get(MockActions);
+import { MockStore, provideMockStore } from '@ngrx/store/testing';
+import { BookStoreService } from 'src/app/shared/books/book-store.service';
+import { selectBook, selectBooks } from '../../store/books/books.selectors';
+
+describe('BookStoreService', () => {
+    let bookStoreService: BookStoreService;
+    let mockStore: MockStore<{ books: BookState }>;
+
+    const books: Book[] = [
+        {
+            author: 'Joost',
+            title: 'Testing the StoreService',
+            year: 2019
+        }
+    ];
+
+    beforeEach(async(() => {
+        TestBed.configureTestingModule({
+            providers: [
+                BookStoreService,
+                provideMockStore({
+                    selectors: [
+                        {
+                            selector: selectBooks,
+                            value: books
+                        },
+                        {
+                            selector: selectBook,
+                            value: books[0]
+                        }
+                    ]
+                })
+            ]
+        });
+    }));
+
+    beforeEach(() => {
+        bookStoreService = TestBed.get(BookStoreService);
+        mockStore = TestBed.get(Store);
+    });
+
+    it('executes the getBooks Selector', () => {
+        const expected = cold('a', { a: books });
+
+        expect(bookStoreService.getAllBooks()).toBeObservable(expected);
+    });
+    it('executes the getBook Selector', () => {
+        const expected = cold('a', { a: books[0] });
+
+        expect(bookStoreService.getBook({ id: 0 })).toBeObservable(expected);
+    });
+});
 ```
 
-The `MockActions` class provides a `next(...)` function which will emit a new value to the `Actions` stream from @ngrx/effects.
-This way you can emit new actions to the stream.
+### Testing StoreService Actions
 
-Here is an example on how to test this using the `MockActions` class.
+You can provide mocks for selectors with the `provideMockStore` from `@ngrx/store/testing` a. See (@ngrx/store Testing)[https://ngrx.io/guide/store/testing] for their documentation.
+
+Mock the selectors using the `provideMockStore` function and check if the `StoreService` returns an Observable with the mocked value.
+
+To test if the `StoreService` dispatches the correct actions the `MockStore` from @ngrx has a property called `scannedActions$`. This is an Observable of all dispatched actions to check if an action was dispatched correctly.
 
 ```ts
-import { NgrxStoreServiceTestingModule, MockActions } from '@ngxp/store-service/testing';
-...
-let mockActions: MockActions;
-...
-TestBed.configureTestingModule({
-    imports: [
-        NgrxStoreServiceTestingModule
-    ]
-})
-...
-mockActions = TestBed.get(MockActions);
-...
-it('test', () => {
-    const expectedValue = [ { author: 'Author', title: 'Title', year: 2018 } ];
-    storeService.booksLoaded$.subscribe(
-        books => {
-            expect(books).toBe(expectedValue);
-        }
-    );
-    const action = new BooksLoadedAction(expectedValue);
-    mockActions.next(action)
-})
+import { MockStore, provideMockStore } from '@ngrx/store/testing';
+import { cold } from 'jasmine-marbles';
+import { BookStoreService } from 'src/app/shared/books/book-store.service';
+import { addBookAction, loadBooksAction } from '../../store/books/books.actions';
+
+describe('BookStoreService', () => {
+    let bookStoreService: BookStoreService;
+    let mockStore: MockStore<{ books: BookState }>;
+
+    beforeEach(async(() => {
+        TestBed.configureTestingModule({
+            providers: [
+                BookStoreService,
+                provideMockStore()
+            ]
+        });
+    }));
+
+    beforeEach(() => {
+        bookStoreService = TestBed.get(BookStoreService);
+        mockStore = TestBed.get(Store);
+    });
+
+    it('dispatches a new addBookAction', () => {
+        const book: Book = getBook();
+        bookStoreService.addBook({ book });
+
+        const expected = cold('a', { a: addBookAction({ book }) });
+        expect(mockStore.scannedActions$).toBeObservable(expected);
+    });
+    it('dispatches a new loadBooksAction', () => {
+        bookStoreService.loadBooks();
+
+        const expected = cold('a', { a: loadBooksAction() });
+        expect(mockStore.scannedActions$).toBeObservable(expected);
+    });
+});
+```
+
+### Testing StoreService Observers
+
+To test the observers / actions stream, you import the `provideMockActions` from `@ngrx/effects/testing` inside the testing module.
+Then check if the Observer filters the correct actions.
+
+```ts
+import { provideMockActions } from '@ngrx/effects/testing';
+import { BehaviorSubject } from 'rxjs';
+import { BookStoreService } from 'src/app/shared/books/book-store.service';
+import { booksLoadedAction } from '../../store/books/books.actions';
+
+describe('BookStoreService', () => {
+    let bookStoreService: BookStoreService;
+    const mockActions = new BehaviorSubject(undefined);
+
+    beforeEach(async(() => {
+        TestBed.configureTestingModule({
+            providers: [
+                BookStoreService,
+                provideMockActions(mockActions)
+            ]
+        });
+    }));
+
+    beforeEach(() => {
+        bookStoreService = TestBed.get(BookStoreService);
+    });
+
+    it('filters the BooksLoadedActions in booksLoaded$', () => {
+        const expectedValue: Book[] = [{
+            author: 'Author',
+            title: 'Title',
+            year: 2018
+        }];
+
+        const action = booksLoadedAction({ books: expectedValue });
+        mockActions.next(action);
+
+        const expected = cold('a', { a: action });
+        
+        expect(bookStoreService.booksLoaded$).toBeObservable(expected);
+    });
+});
+
 ```
 
 # Examples
