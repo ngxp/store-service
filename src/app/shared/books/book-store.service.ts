@@ -1,7 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Dispatch, Dispatcher, Observe, Select, Selector, StoreService } from '@ngxp/store-service';
-import { Observable } from 'rxjs';
-import { Book } from 'src/app/shared/books/book.model';
+import { dispatch, observe, select, StoreService } from '@ngxp/store-service';
 import { addBookAction, booksLoadedAction, loadBooksAction } from '../../store/books/books.actions';
 import { BookState } from '../../store/books/books.reducer';
 import { selectBook, selectBooks } from '../../store/books/books.selectors';
@@ -9,19 +7,14 @@ import { selectBook, selectBooks } from '../../store/books/books.selectors';
 @Injectable()
 export class BookStoreService extends StoreService<BookState> {
 
-    @Select(selectBooks)
-    getAllBooks: Selector<typeof selectBooks>;
+    getAllBooks = select(selectBooks);
 
-    @Select(selectBook)
-    getBook: Selector<typeof selectBook>;
+    getBook = select(selectBook);
 
-    @Dispatch(addBookAction)
-    addBook: Dispatcher<typeof addBookAction>;
+    addBook = dispatch(addBookAction);
 
-    @Dispatch(loadBooksAction)
-    loadBooks: Dispatcher<typeof loadBooksAction>;
+    loadBooks = dispatch(loadBooksAction);
 
-    @Observe([booksLoadedAction], action => action.books)
-    booksLoaded$: Observable<Book[]>;
+    booksLoaded$ = observe([booksLoadedAction], a => a.books);
 }
 

@@ -1,8 +1,8 @@
 import { Component, OnDestroy } from '@angular/core';
 import { Observable } from 'rxjs';
+import { distinctUntilChanged, filter, takeWhile } from 'rxjs/operators';
 import { BookStoreService } from 'src/app/shared/books/book-store.service';
 import { Book } from 'src/app/shared/books/book.model';
-import { distinctUntilChanged, takeWhile, filter } from 'rxjs/operators';
 
 @Component({
     selector: 'nss-book-list',
@@ -20,7 +20,7 @@ export class BookListComponent implements OnDestroy {
         private bookStore: BookStoreService
     ) {
         this.books$ = this.bookStore.getAllBooks();
-        this.bookStore.booksLoaded$.pipe(
+        this.bookStore.booksLoaded$().pipe(
             filter(val => Array.isArray(val)),
             distinctUntilChanged(),
             takeWhile(() => this.alive)

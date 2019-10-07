@@ -84,6 +84,6 @@ describe('BookStoreService', () => {
         mockActions.next(action);
 
         const expected = cold('a', { a: action.books });
-        expect(bookStoreService.booksLoaded$).toBeObservable(expected);
+        expect(bookStoreService.booksLoaded$()).toBeObservable(expected);
     });
 });

@@ -67,7 +67,7 @@ describe('BookListComponent', () => {
         expect(loadedEl).toBeFalsy();
     });
     it('renders a non-loaded element initially', () => {
-        bookStoreService.booksLoaded$.next(books);
+        bookStoreService.booksLoaded$().next(books);
         fixture.detectChanges();
 
         const notLoadedEl = (<Element> fixture.nativeElement).querySelector('.not-loaded');
