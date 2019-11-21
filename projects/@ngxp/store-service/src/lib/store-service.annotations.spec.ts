@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Actions } from '@ngrx/effects';
-import { Action, Action as NgrxAction, createAction, createSelector, MemoizedSelector, MemoizedSelectorWithProps, props } from '@ngrx/store';
+import { Action, createAction, createSelector, MemoizedSelector, MemoizedSelectorWithProps, props } from '@ngrx/store';
 import { TypedAction } from '@ngrx/store/src/models';
 import { Observable, of, Subject } from 'rxjs';
 import { take } from 'rxjs/operators';
@@ -10,7 +10,7 @@ import { Dispatch, Observe, Select, STORE_SERVICE_ACTIONS, STORE_SERVICE_SELECTO
 // Needed because we can't import from testing...
 class MockStore {
 
-    dispatchedActions: NgrxAction[] = [];
+    dispatchedActions: Action[] = [];
 
     constructor(
         private _state: any
@@ -41,6 +41,13 @@ const selectorFn = createSelector(
 const actionType = 'someType';
 
 const addEntityAction = createAction(actionType, props<{ entity: any }>());
+
+class AddOldEntityAction implements Action {
+    type = actionType;
+    constructor(
+        public entity: any
+    ) { }
+}
 @Injectable()
 class MockService extends StoreService<any> {
     @Select(selectorFn)
@@ -48,6 +55,9 @@ class MockService extends StoreService<any> {
 
     @Dispatch(addEntityAction)
     addEntity: ({ entity }) => void;
+
+    @Dispatch(AddOldEntityAction)
+    addOldEntity: (entity) => void;
 
     @Observe([entityAddedActionType, addEntityAction])
     addedEntitie$: Observable<any>;
@@ -111,11 +121,34 @@ describe('Ngrx Store Service Annotations', () => {
             expect(dispatchedAction.entity).toBe(entity);
         });
 
+        it('calls dispatch function on the store instance for old actions', () => {
+            const entity = { name: 'entity' };
+            const storeDispatchSpy = spyOn(store, 'dispatch').and.callThrough();
+
+            service.addOldEntity(entity);
+
+            expect(storeDispatchSpy).toHaveBeenCalled();
+
+            const dispatchedAction = <AddOldEntityAction> store.dispatchedActions[store.dispatchedActions.length - 1];
+
+            expect(dispatchedAction.type).toBe(actionType);
+            expect(dispatchedAction.entity).toBe(entity);
+        });
+
         it('can be spied upon', () => {
             const entity = { name: 'entity' };
             const addEntitySpy = spyOn(service, 'addEntity');
 
             service.addEntity({ entity });
+
+            expect(addEntitySpy).toHaveBeenCalled();
+        });
+
+        it('can be spied upon for old action', () => {
+            const entity = { name: 'entity' };
+            const addEntitySpy = spyOn(service, 'addOldEntity');
+
+            service.addOldEntity(entity);
 
             expect(addEntitySpy).toHaveBeenCalled();
         });

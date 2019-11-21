@@ -1,6 +1,7 @@
 import { ofType } from '@ngrx/effects';
-import { ActionCreator, Creator } from '@ngrx/store';
+import { ActionCreator, Creator, Action } from '@ngrx/store';
 import { map } from 'rxjs/operators';
+import { Type } from '@angular/core';
 
 export const STORE_SERVICE_SELECTORS = '__STORE_SERVICE_SELECTORS';
 export const STORE_SERVICE_ACTIONS = '__STORE_SERVICE_ACTIONS';
@@ -26,14 +27,20 @@ export function Select<S, P, R>(selectorFn: Selector<S, R> | SelectorWithProps<S
     };
 }
 
-export function Dispatch<T extends string, C extends Creator>(actionCreator: ActionCreator<T, C>): PropertyDecorator {
+export function Dispatch<T extends string, C extends Creator, A extends Action>(
+    actionCreator: ActionCreator<T, C> | Type<A>
+): PropertyDecorator {
     return (target, propertyKey) => {
         if (!Array.isArray(target[STORE_SERVICE_ACTIONS])) {
             target[STORE_SERVICE_ACTIONS] = [];
         }
 
         target[propertyKey] = function (...args) {
-            return this.store.dispatch(actionCreator(...args));
+            if (actionCreator.prototype && actionCreator.prototype.constructor) {
+                return this.store.dispatch(new (<any> actionCreator)(...args));
+            } else {
+                return this.store.dispatch((<ActionCreator<T, C>>actionCreator)(...args));
+            }
         };
 
         target[STORE_SERVICE_ACTIONS] = [
