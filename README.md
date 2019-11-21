@@ -15,6 +15,7 @@ Adds an abstraction layer between Angular components and the [@ngrx](https://git
     * [Observers](#observers)
         * [Observe multiple types](#multiple-types)
         * [Use objects with type property](#objects-with-type-property)
+        * [String action types](#string-action-types)
         * [Custom mapper](#custom-mapper)
 * [Testing](#testing)
     * [Testing Components](#testing-components)
@@ -209,6 +210,13 @@ To dispatch actions add a property with the `@Dispatch(...)` annotation.
 export const loadBooksAction = createAction('[Books] Load books');
 
 export const addBookAction = createAction('[Books] Add book' props<{ book: Book}>())
+
+export class OldAddBookAction implements Action {
+    type = '[Books] Add book';
+    constructor(
+        public book: Book
+    ) { }
+}
 ...
 // Use the Action class inside the @Dispatch(...) annotation
 @Dispatch(loadBooksAction)
@@ -216,9 +224,12 @@ loadBooks: Dispatcher<typeof loadBooksAction>; // () => void
 
 @Dispatch(addBookAction)
 addBook: Dispatcher<typeof addBookAction>; // (props: { book: Book }) => void
+
+@Dispatch(OldAddBookAction)
+addOldBook: (book: Book) => void; // Manual typing for old action classes
 ```
 
-The `Dispatcher<...>` type automatically infers the parameters according to the props of the action.
+The `Dispatcher<...>` type automatically infers the parameters according to the props of the action. But this only works with the new ActionCreators (`createAction(...)`) and not the old `Action` classes.
 
 
 ## Observers
@@ -245,6 +256,18 @@ Objects with a `type` property are also valid.
 const action = { type: 'booksLoaded' };
 ...
 @Observe([action])
+booksLoaded$: Observable<Book[]>;
+```
+
+### String action types
+Plain type strings are also valid.
+
+```ts
+export enum ActionType {
+    BooksLoaded = 'booksLoaded'
+}
+...
+@Observe([ActionType.BooksLoaded])
 booksLoaded$: Observable<Book[]>;
 ```
 
