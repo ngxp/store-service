@@ -1,4 +1,4 @@
-import { createReducer, on } from '@ngrx/store';
+import { Action, createReducer, on } from '@ngrx/store';
 import { Book } from 'src/app/shared/books/book.model';
 import { addBookAction, booksLoadedAction } from 'src/app/store/books/books.actions';
 
@@ -24,3 +24,7 @@ export const bookReducer = createReducer(
         ]
     }))
 );
+
+export function reducer(state: BookState, action: Action): BookState {
+    return bookReducer(state, action);
+}
