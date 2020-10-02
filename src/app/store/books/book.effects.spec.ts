@@ -1,5 +1,6 @@
 import { Actions } from '@ngrx/effects';
 import { cold } from 'jasmine-marbles';
+import { of } from 'rxjs';
 import { BookService } from 'src/app/shared/books/book.service';
 import { BookEffects } from 'src/app/store/books/book.effects';
 import { getBooks } from 'src/test/books';
@@ -11,16 +12,15 @@ describe('BookEffects', () => {
 
     describe('loadBooks', () => {
         it('loads the books via service', () => {
-            const source = cold('a', { a: loadBooksAction() });
+            const source = of(loadBooksAction());
 
             const loadBooksSpy = spyOn(service, 'loadBooks').and.callThrough();
 
             const effects = new BookEffects(new Actions(source), service);
 
-            effects.loadBooks
-                .subscribe(() => {
-                    expect(loadBooksSpy).toHaveBeenCalled();
-                });
+            effects.loadBooks.subscribe();
+
+            expect(loadBooksSpy).toHaveBeenCalled();
         });
         it('dispatches a BooksLoadedAction', () => {
             const source = cold('a', { a: loadBooksAction() });
