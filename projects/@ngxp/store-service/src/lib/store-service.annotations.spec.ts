@@ -159,6 +159,9 @@ describe('Ngrx Store Service Annotations', () => {
     });
 
     describe('Observe', () => {
+        beforeEach(() => {
+            actionsSubject.next(null);
+        });
         it('filters actions of type', () => {
             const expectedPayload = { value: 'payload' };
             const action = {
