@@ -1,6 +1,5 @@
-import { async, TestBed } from '@angular/core/testing';
+import { TestBed, waitForAsync } from '@angular/core/testing';
 import { provideMockActions } from '@ngrx/effects/testing';
-import { Store } from '@ngrx/store';
 import { MockStore, provideMockStore } from '@ngrx/store/testing';
 import { cold } from 'jasmine-marbles';
 import { BehaviorSubject } from 'rxjs';
@@ -24,7 +23,7 @@ describe('BookStoreService', () => {
         }
     ];
 
-    beforeEach(async(() => {
+    beforeEach(waitForAsync(() => {
         TestBed.configureTestingModule({
             providers: [
                 BookStoreService,
@@ -46,8 +45,8 @@ describe('BookStoreService', () => {
     }));
 
     beforeEach(() => {
-        bookStoreService = TestBed.get(BookStoreService);
-        mockStore = TestBed.get(Store);
+        bookStoreService = TestBed.inject(BookStoreService);
+        mockStore = TestBed.inject(MockStore);
     });
 
     it('executes the getBooks Selector', () => {

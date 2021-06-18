@@ -1,4 +1,5 @@
 import { Type, ValueProvider } from '@angular/core';
+import { TestBed } from '@angular/core/testing';
 import { BehaviorSubject, Observable } from 'rxjs';
 
 // Needed because otherwise the build would fail.
@@ -7,7 +8,7 @@ export const STORE_SERVICE_OBSERVERS = '__STORE_SERVICE_OBSERVERS';
 export const STORE_SERVICE_ACTIONS = '__STORE_SERVICE_ACTIONS';
 
 type SelectorMethod<R> = (...args: any[]) => BehaviorSubject<R>;
-type ActionDispatcherMethod = () => void;
+type ActionDispatcherMethod = (...args: any[]) => void;
 type ObserverMethod<U> = BehaviorSubject<U>;
 
 export type StoreServiceMock<T> = {
@@ -80,4 +81,9 @@ export function provideStoreServiceMock<T>(
         provide: serviceClass,
         useValue: createStoreServiceMock(serviceClass, initialValues),
     };
+}
+
+// Custom method to get mocked Service. With any typing to fix error because types don't match
+export function getStoreServiceMock<T>(type: Type<T>): StoreServiceMock<T> {
+    return TestBed.inject<any>(type);
 }

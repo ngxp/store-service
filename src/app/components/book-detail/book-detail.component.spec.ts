@@ -1,4 +1,5 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { ActivatedRoute } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { provideStoreServiceMock } from '@ngxp/store-service/testing';
 import { BookStoreService } from '../../shared/books/book-store.service';
@@ -10,16 +11,25 @@ describe('BookDetailComponent', () => {
     let component: BookDetailComponent;
     let fixture: ComponentFixture<BookDetailComponent>;
 
-    beforeEach(async(() => {
+    const activatedRoute = {
+        snapshot: {
+            params: {
+                bookId: '1'
+            }
+        }
+    };
+
+    beforeEach(waitForAsync(() => {
         TestBed.configureTestingModule({
-            imports: [
-                RouterTestingModule
-            ],
             declarations: [
                 BookDetailComponent,
                 BookListEntryComponent
             ],
             providers: [
+                {
+                    provide: ActivatedRoute,
+                    useValue: activatedRoute
+                },
                 provideStoreServiceMock(BookStoreService)
             ]
         })

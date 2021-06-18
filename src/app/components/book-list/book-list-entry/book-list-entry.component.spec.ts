@@ -1,13 +1,13 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-
-import { BookListEntryComponent } from './book-list-entry.component';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { getBook } from 'src/test/books';
+import { BookListEntryComponent } from './book-list-entry.component';
+
 
 describe('BookListEntryComponent', () => {
     let component: BookListEntryComponent;
     let fixture: ComponentFixture<BookListEntryComponent>;
 
-    beforeEach(async(() => {
+    beforeEach(waitForAsync(() => {
         TestBed.configureTestingModule({
             declarations: [BookListEntryComponent]
         })

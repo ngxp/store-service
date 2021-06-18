@@ -33,7 +33,6 @@ Adds an abstraction layer between Angular components and the [@ngrx](https://git
 # Installation
 
 Get the latest version from NPM 
-> The current version requires Angular 8 & Ngrx 8
 
 ```sh
 npm install @ngxp/store-service
@@ -299,7 +298,7 @@ To test selectors you provide the `StoreService` using the `provideStoreServiceM
 
 
 ```ts
-import { provideStoreServiceMock, StoreServiceMock } from '@ngxp/store-service/testing';
+import { provideStoreServiceMock, StoreServiceMock, getStoreServiceMock } from '@ngxp/store-service/testing';
 ...
 let bookStoreService: StoreServiceMock<BookStoreService>;
 ...
@@ -312,7 +311,7 @@ TestBed.configureTestingModule({
     ]
 })
 ...
-bookStoreService = TestBed.get(BookStoreService);
+bookStoreService = getStoreServiceMock(BookStoreService);
 ```
 
 The `StoreServiceMock` class replaces all selector functions on the store service class with a `BehaviorSubject`. So now you can do the following to emit new values to the observables:
@@ -324,7 +323,7 @@ bookStoreService.getAllBooks().next(newBooks);
 The `BehaviorSubject` is initialized with the value being `undefined`. If you want a custom initial value, the `provideStoreServiceMock` method offers an optional parameter. This is an object of key value pairs where the key is the name of the selector function, e.g. `getAllBooks`.
 
 ```ts
-import { provideStoreServiceMock, StoreServiceMock } from '@ngxp/store-service/testing';
+import { provideStoreServiceMock, StoreServiceMock, getStoreServiceMock } from '@ngxp/store-service/testing';
 ...
 let bookStoreService: StoreServiceMock<BookStoreService>;
 ...
@@ -339,7 +338,7 @@ TestBed.configureTestingModule({
     ]
 })
 ...
-bookStoreService = TestBed.get(BookStoreService);
+bookStoreService = getStoreServiceMock(BookStoreService);
 ```
 
 The `BehaviorSubject` for `getAllBooks` is now initialized with an empty array instead of `undefined`.
@@ -381,7 +380,7 @@ To test observers inside components you provide the `StoreService` using the `pr
 
 
 ```ts
-import { provideStoreServiceMock, StoreServiceMock } from '@ngxp/store-service/testing';
+import { provideStoreServiceMock, StoreServiceMock, getStoreServiceMock } from '@ngxp/store-service/testing';
 ...
 let bookStoreService: StoreServiceMock<BookStoreService>;
 ...
@@ -394,7 +393,7 @@ TestBed.configureTestingModule({
     ]
 })
 ...
-bookStoreService = TestBed.get(BookStoreService);
+bookStoreService = getStoreServiceMock(BookStoreService);
 ```
 
 The `StoreServiceMock` class replaces all observer properties on the store service class with a `BehaviorSubject`. So now you can do the following to emit new values to the subscribers:
@@ -406,7 +405,7 @@ bookStoreService.booksLoaded$.next(true);
 The `BehaviorSubject` is initialized with the value being `undefined`. If you want a custom initial value, the `provideStoreServiceMock` method offers an optional parameter. This is an object of key value pairs where the key is the name of the observer property, e.g. `booksLoaded$`.
 
 ```ts
-import { provideStoreServiceMock, StoreServiceMock } from '@ngxp/store-service/testing';
+import { provideStoreServiceMock, StoreServiceMock, getStoreServiceMock } from '@ngxp/store-service/testing';
 ...
 let bookStoreService: StoreServiceMock<BookStoreService>;
 ...
@@ -421,7 +420,7 @@ TestBed.configureTestingModule({
     ]
 })
 ...
-bookStoreService = TestBed.get(BookStoreService);
+bookStoreService = getStoreServiceMock(BookStoreService);
 ```
 
 The `BehaviorSubject` for `booksLoaded$` is now initialized with `false` instead of `undefined`.
@@ -438,7 +437,7 @@ You can provide mocks for selectors with the `provideMockStore` from `@ngrx/stor
 Mock the selectors using the `provideMockStore` function and check if the `StoreService` returns an Observable with the mocked value.
 
 ```ts
-import { MockStore, provideMockStore } from '@ngrx/store/testing';
+import { MockStore, provideMockStore, getStoreServiceMock } from '@ngrx/store/testing';
 import { BookStoreService } from 'src/app/shared/books/book-store.service';
 import { selectBook, selectBooks } from '../../store/books/books.selectors';
 
@@ -454,7 +453,7 @@ describe('BookStoreService', () => {
         }
     ];
 
-    beforeEach(async(() => {
+    beforeEach(waitForAsync(() => {
         TestBed.configureTestingModule({
             providers: [
                 BookStoreService,
@@ -475,8 +474,8 @@ describe('BookStoreService', () => {
     }));
 
     beforeEach(() => {
-        bookStoreService = TestBed.get(BookStoreService);
-        mockStore = TestBed.get(Store);
+        bookStoreService = getStoreServiceMock(BookStoreService);
+        mockStore = TestBed.inject(Mockstore);
     });
 
     it('executes the getBooks Selector', () => {
@@ -501,7 +500,7 @@ Mock the selectors using the `provideMockStore` function and check if the `Store
 To test if the `StoreService` dispatches the correct actions the `MockStore` from @ngrx has a property called `scannedActions$`. This is an Observable of all dispatched actions to check if an action was dispatched correctly.
 
 ```ts
-import { MockStore, provideMockStore } from '@ngrx/store/testing';
+import { MockStore, provideMockStore, getStoreServiceMock } from '@ngrx/store/testing';
 import { cold } from 'jasmine-marbles';
 import { BookStoreService } from 'src/app/shared/books/book-store.service';
 import { addBookAction, loadBooksAction } from '../../store/books/books.actions';
@@ -510,7 +509,7 @@ describe('BookStoreService', () => {
     let bookStoreService: BookStoreService;
     let mockStore: MockStore<{ books: BookState }>;
 
-    beforeEach(async(() => {
+    beforeEach(waitForAsync(() => {
         TestBed.configureTestingModule({
             providers: [
                 BookStoreService,
@@ -520,8 +519,8 @@ describe('BookStoreService', () => {
     }));
 
     beforeEach(() => {
-        bookStoreService = TestBed.get(BookStoreService);
-        mockStore = TestBed.get(Store);
+        bookStoreService = getStoreServiceMock(BookStoreService);
+        mockStore = TestBed.inject(MockStore);
     });
 
     it('dispatches a new addBookAction', () => {
@@ -546,6 +545,7 @@ To test the observers / actions stream, you import the `provideMockActions` from
 Then check if the Observer filters the correct actions.
 
 ```ts
+import { getStoreServiceMock } from '@ngxp/store-service/testing';
 import { provideMockActions } from '@ngrx/effects/testing';
 import { BehaviorSubject } from 'rxjs';
 import { BookStoreService } from 'src/app/shared/books/book-store.service';
@@ -555,7 +555,7 @@ describe('BookStoreService', () => {
     let bookStoreService: BookStoreService;
     const mockActions = new BehaviorSubject(undefined);
 
-    beforeEach(async(() => {
+    beforeEach(waitForAsync(() => {
         TestBed.configureTestingModule({
             providers: [
                 BookStoreService,
@@ -565,7 +565,7 @@ describe('BookStoreService', () => {
     }));
 
     beforeEach(() => {
-        bookStoreService = TestBed.get(BookStoreService);
+        bookStoreService = getStoreServiceMock(BookStoreService);
     });
 
     it('filters the BooksLoadedActions in booksLoaded$', () => {

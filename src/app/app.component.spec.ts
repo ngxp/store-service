@@ -1,6 +1,6 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { RouterTestingModule } from '@angular/router/testing';
-import { provideStoreServiceMock, StoreServiceMock } from '@ngxp/store-service/testing';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { getStoreServiceMock, provideStoreServiceMock, StoreServiceMock } from '@ngxp/store-service/testing';
 import { AppComponent } from 'src/app/app.component';
 import { BookStoreService } from 'src/app/shared/books/book-store.service';
 
@@ -9,29 +9,29 @@ describe('AppComponent', () => {
     let component: AppComponent;
     let bookStoreService: StoreServiceMock<BookStoreService>;
 
-    beforeEach(async(() => {
+    beforeEach(waitForAsync(() => {
         TestBed.configureTestingModule({
-            imports: [
-                RouterTestingModule
-            ],
             declarations: [
                 AppComponent,
             ],
             providers: [
                 provideStoreServiceMock(BookStoreService)
+            ],
+            schemas: [
+                NO_ERRORS_SCHEMA
             ]
         }).compileComponents();
     }));
 
     beforeEach(() => {
         fixture = TestBed.createComponent(AppComponent);
-        bookStoreService = TestBed.get(BookStoreService);
+        bookStoreService = getStoreServiceMock(BookStoreService);
         component = fixture.componentInstance;
         debugger;
         fixture.detectChanges();
     });
 
-    it('should create the app', async(() => {
+    it('should create the app', waitForAsync(() => {
         const app = fixture.debugElement.componentInstance;
         expect(app).toBeTruthy();
     }));

@@ -1,5 +1,5 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { provideStoreServiceMock, StoreServiceMock } from '@ngxp/store-service/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { provideStoreServiceMock, StoreServiceMock, getStoreServiceMock } from '@ngxp/store-service/testing';
 import { AppModule } from 'src/app/app.module';
 import { BookStoreService } from 'src/app/shared/books/book-store.service';
 import { getBook } from 'src/test/books';
@@ -10,7 +10,7 @@ describe('NewBookComponent', () => {
     let fixture: ComponentFixture<NewBookComponent>;
     let bookStoreService: StoreServiceMock<BookStoreService>;
 
-    beforeEach(async(() => {
+    beforeEach(waitForAsync(() => {
         TestBed.configureTestingModule({
             imports: [
                 AppModule
@@ -24,7 +24,7 @@ describe('NewBookComponent', () => {
 
     beforeEach(() => {
         fixture = TestBed.createComponent(NewBookComponent);
-        bookStoreService = TestBed.get(BookStoreService);
+        bookStoreService = getStoreServiceMock(BookStoreService);
         component = fixture.componentInstance;
         fixture.detectChanges();
     });
