@@ -24,8 +24,11 @@ jobs:
       - run: cp README.md dist/@ngxp/store-service/README.md
       - run: cd dist/@ngxp/store-service
       - uses: JS-DevTools/npm-publish@v1
+        if: startsWith(github.ref, 'refs/tags/v')
         with:
           token: ${{ secrets.NPM_TOKEN }}
+          package: "./dist/@ngxp/store-service"
+          dry-run: true
     
       
     
