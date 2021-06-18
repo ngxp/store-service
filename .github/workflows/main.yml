@@ -22,15 +22,10 @@ jobs:
       - run: npm run test-ci:lib
       - run: npm run build-ci:lib
       - run: cp README.md dist/@ngxp/store-service/README.md
-      
-  publish:
-    if: startsWith(github.ref, 'refs/tags/v')
-    needs: [build]
-    runs-on: ubuntu-latest
-    
-    steps:
-      - run: pwd
-      - run: ls -l dist/@ngxp/store-service
+      - run: cd dist/@ngxp/store-service
+      - uses: JS-DevTools/npm-publish@v1
+        with:
+          token: ${{ secrets.NPM_TOKEN }}
     
       
     
