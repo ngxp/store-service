@@ -20,7 +20,7 @@ export class BookListComponent implements OnDestroy {
         private bookStore: BookStoreService
     ) {
         this.books$ = this.bookStore.getAllBooks();
-        this.bookStore.booksLoaded$.pipe(
+        this.bookStore.booksLoaded$().pipe(
             filter(val => Array.isArray(val)),
             distinctUntilChanged(),
             takeWhile(() => this.alive)

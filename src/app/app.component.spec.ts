@@ -27,7 +27,6 @@ describe('AppComponent', () => {
         fixture = TestBed.createComponent(AppComponent);
         bookStoreService = getStoreServiceMock(BookStoreService);
         component = fixture.componentInstance;
-        debugger;
         fixture.detectChanges();
     });
 

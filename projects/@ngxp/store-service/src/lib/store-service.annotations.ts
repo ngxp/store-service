@@ -2,6 +2,8 @@ import { ofType } from '@ngrx/effects';
 import { ActionCreator, Creator, Action } from '@ngrx/store';
 import { map } from 'rxjs/operators';
 import { Type } from '@angular/core';
+import { Observable } from 'rxjs';
+import { Dispatcher, Selector as SelectorReturnType } from './store-service';
 
 export const STORE_SERVICE_SELECTORS = '__STORE_SERVICE_SELECTORS';
 export const STORE_SERVICE_ACTIONS = '__STORE_SERVICE_ACTIONS';
@@ -37,7 +39,7 @@ export function Dispatch<T extends string, C extends Creator, A extends Action>(
 
         target[propertyKey] = function (...args) {
             if (actionCreator.prototype && actionCreator.prototype.constructor) {
-                return this.store.dispatch(new (<any> actionCreator)(...args));
+                return this.store.dispatch(new (<any>actionCreator)(...args));
             } else {
                 return this.store.dispatch((<ActionCreator<T, C>>actionCreator)(...args));
             }
@@ -81,3 +83,47 @@ export function Observe(
         ];
     };
 }
+
+
+export function select<S>(selectorFn: S): SelectorReturnType<S> {
+    const fn = function (props: any) {
+        return this.store.select(selectorFn, props);
+    };
+
+    Object.defineProperty(fn, STORE_SERVICE_SELECTORS, {
+        value: true
+    });
+
+    return <any>fn;
+}
+
+
+export function dispatch<A extends ActionCreator>(actionCreator: A): Dispatcher<A> {
+    const fn = function (args: any) {
+        return this.store.dispatch(actionCreator(args));
+    };
+
+    Object.defineProperty(fn, STORE_SERVICE_ACTIONS, {
+        value: true
+    });
+
+    return <any>fn;
+}
+
+export const observe = function <A extends ActionCreator, R extends ReturnType<A>, K extends keyof R, M extends R | R[K]>(
+    actions: A[],
+    customMapper?: (action: R) => M): () => Observable<M> {
+    const fn = function () {
+        return this.actions.pipe(
+            ofType(...actions),
+            map((a: any) => customMapper ? customMapper(a) : a)
+        );
+    };
+
+    Object.defineProperty(fn, STORE_SERVICE_OBSERVERS, {
+        value: true
+    });
+
+    return <any>fn;
+};
+

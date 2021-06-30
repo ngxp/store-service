@@ -25,53 +25,75 @@ export function createStoreServiceMock<T>(
 
     const service = new serviceClass();
 
-    const selectors = serviceClass.prototype[STORE_SERVICE_SELECTORS];
-
+    const selectors = findProps(serviceClass, service, STORE_SERVICE_SELECTORS);
     if (Array.isArray(selectors)) {
-        Object.keys(serviceClass.prototype)
-            .filter(key => selectors.includes(key))
-            .forEach(key => {
-                const initialValue = initialValues[key] ? initialValues[key] : undefined;
-                const subject = new BehaviorSubject(initialValue);
-                Object.defineProperty(service, key, {
-                    get: () => () => subject,
-                    set: () => { },
-                    configurable: true,
-                    enumerable: true
-                });
-            });
+        mockSelectors(service, selectors, initialValues);
     }
 
-    const observers = serviceClass.prototype[STORE_SERVICE_OBSERVERS];
-
+    const observers = findProps(serviceClass, service, STORE_SERVICE_OBSERVERS);
     if (Array.isArray(observers)) {
-        Object.keys(serviceClass.prototype)
-            .filter(key => observers.includes(key))
-            .forEach(key => {
-                const initialValue = initialValues[key] ? initialValues[key] : undefined;
-                const subject = new BehaviorSubject(initialValue);
-                Object.defineProperty(service, key, {
-                    get: () => subject,
-                    set: () => { },
-                    configurable: true,
-                    enumerable: true
-                });
-            });
+        mockObservers(service, observers, initialValues);
     }
 
-    const dispatchers = serviceClass.prototype[STORE_SERVICE_ACTIONS];
-
+    const dispatchers = findProps(serviceClass, service, STORE_SERVICE_ACTIONS);
     if (Array.isArray(dispatchers)) {
-        Object.keys(serviceClass.prototype)
-            .filter(key => dispatchers.includes(key))
-            .forEach(key => {
-                service[key] = function (...args) { };
-            });
+        mockDispatchers(service, dispatchers);
     }
 
     const serviceMock: StoreServiceMock<T> & T = <any>service;
     return serviceMock;
 }
+
+function findProps<T>(serviceClass: Type<T>, service: T, propType: string): string[] {
+    let props = [];
+
+    const propsOld = serviceClass.prototype[propType];
+    if (Array.isArray(propsOld)) {
+        props = [...props, ...propsOld];
+    }
+
+    const propsNew = Object.keys(service)
+        .filter(key => service[key] !== undefined)
+        .filter(key => service[key][propType] === true);
+    if (Array.isArray(propsNew)) {
+        props = [...props, ...propsNew];
+    }
+
+    return props;
+}
+
+
+function mockSelectors<T>(service: T, selectors: string[], initialValues) {
+       selectors.forEach(key => {
+            const initialValue = initialValues[key] ? initialValues[key] : undefined;
+            const subject = new BehaviorSubject(initialValue);
+
+            service[key] = () => subject;
+       })
+}
+
+function mockObservers<T>(service: T, observers: string[], initialValues) {
+    observers.forEach(key => {
+        const initialValue = initialValues[key] ? initialValues[key] : undefined;
+        const subject = new BehaviorSubject(initialValue);
+
+        Object.defineProperty(service, key, {
+            get: function () {
+                return () => subject
+            },
+            set: function () { },
+            enumerable: true,
+            configurable: true
+        });
+   })
+}
+
+function mockDispatchers<T>(service: T, dispatchers: string[]) {
+    dispatchers.forEach(key => {
+        service[key] = function (...args) { };
+   })
+}
+
 
 export function provideStoreServiceMock<T>(
     serviceClass: Type<T>,
