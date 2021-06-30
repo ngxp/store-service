@@ -131,8 +131,7 @@ export class BookListComponent {
 
 ```ts
 import { Injectable } from '@angular/core';
-import { Select, StoreService, Dispatch, Selector, Dispatcher } from '@ngxp/store-service';
-import { Observable } from 'rxjs';
+import { select, StoreService, dispatch, observe } from '@ngxp/store-service';
 import { Book } from 'src/app/shared/books/book.model';
 import { getBooks } from 'src/app/store/books/books.selectors';
 import { State } from 'src/app/store/store.model';
@@ -141,17 +140,13 @@ import { addBookAction, booksLoadedAction } from 'src/app/store/books/books.acti
 @Injectable()
 export class BookStoreService extends StoreService<State> {
 
-    @Select(getBooks) // <- Selector
-    getAllBooks: Selector<typeof getBook>;
+    getAllBooks = select(getBooks); // <- Selector
 
-    @Select(getBook) // <- Selector
-    getBook: Selector<typeof getBook>;
+    getBook = select(getBook); // <- Selector
 
-    @Dispatch(addBookAction) // <- Action
-    addBook: Dispatcher<typeof addBookAction>;
+    addBook = dispatch(addBookAction); // <- Action
 
-    @Observe([booksLoadedAction])
-    booksLoaded$: Observable<Book[]>; // <- Observer / Action stream
+    booksLoaded$ = observe([booksLoadedAction]); // <- Observer / Action stream
 }
 ```
 
@@ -174,7 +169,7 @@ export class BookStoreService extends StoreService<AppState> {
 
 ## Selectors
 
-To use selectors you add the `@Select(...)` decorator inside the `StoreService`. Provide the selector function inside the `@Select(...)` annotation:
+To use selectors you wrap the ngrx selector inside the `select(...)` function:
 
 ```ts
 // Define the selector function
@@ -188,21 +183,19 @@ export const selectBook = createSelector(
 };
 ...
 
-// Use the selector function inside the @Select(...) annotation
-@Select(selectAllBooks)
-allBooks: Selector<typeof selectAllBooks>; // () => Observable<Book[]>
+// Use the selector function inside the select(...) function
+allBooks = select(selectAllBooks); // () => Observable<Book[]>
 
-@Select(selectBook)
-book: Selector<typeof selectBook>; // (props: { id: number }) => Observable<Book>
+book = select(selectBook); // (props: { id: number }) => Observable<Book>
 ```
-The `Selector<...>` type automatically infers the correct typing according to the props and return type of the selector.
+The `select(...)` function automatically infers the correct typing according to the props and return type of the selector.
 
 
 
 
 ## Actions
 
-To dispatch actions add a property with the `@Dispatch(...)` annotation.
+To dispatch actions add a property with the `dispatch(...)` function.
 
 ```ts
 // Defined the Action as a class
@@ -210,25 +203,13 @@ export const loadBooksAction = createAction('[Books] Load books');
 
 export const addBookAction = createAction('[Books] Add book' props<{ book: Book}>())
 
-export class OldAddBookAction implements Action {
-    type = '[Books] Add book';
-    constructor(
-        public book: Book
-    ) { }
-}
 ...
-// Use the Action class inside the @Dispatch(...) annotation
-@Dispatch(loadBooksAction)
-loadBooks: Dispatcher<typeof loadBooksAction>; // () => void
+loadBooks = dispatch(loadBooksAction); // () => void
 
-@Dispatch(addBookAction)
-addBook: Dispatcher<typeof addBookAction>; // (props: { book: Book }) => void
-
-@Dispatch(OldAddBookAction)
-addOldBook: (book: Book) => void; // Manual typing for old action classes
+addBook = dispatch(addBookAction); // (props: { book: Book }) => void
 ```
 
-The `Dispatcher<...>` type automatically infers the parameters according to the props of the action. But this only works with the new ActionCreators (`createAction(...)`) and not the old `Action` classes.
+The `dispatch(...)` function automatically infers the parameters according to the props of the action.
 
 
 ## Observers
@@ -236,55 +217,30 @@ The `Dispatcher<...>` type automatically infers the parameters according to the 
 Observers are a way to listen for specific action types on the `Actions` stream from [@ngrx/effects](https://github.com/ngrx/platform/blob/master/docs/effects/README.md).
 
 ```ts
-@Observe([booksLoadedAction])
-booksLoaded$: Observable<Book[]>;
+booksLoaded$ = observe([booksLoadedAction]);
 ```
 
 ### Multiple types
 You can provide multiple types, just like in the `ofType(...)` pipe.
 
 ```ts
-@Observe([booksLoadedAction, booksLoadFailedAction])
-booksLoaded$: Observable<Book[] | string>;
-```
-
-### Objects with type property
-Objects with a `type` property are also valid.
-
-```ts
-const action = { type: 'booksLoaded' };
-...
-@Observe([action])
-booksLoaded$: Observable<Book[]>;
-```
-
-### String action types
-Plain type strings are also valid.
-
-```ts
-export enum ActionType {
-    BooksLoaded = 'booksLoaded'
-}
-...
-@Observe([ActionType.BooksLoaded])
-booksLoaded$: Observable<Book[]>;
+booksLoaded$ = observe([booksLoadedAction, booksLoadFailedAction]);
 ```
 
 ### Custom mapper
-The `@Observe(...)` decorator has an additional parameter to provide a custom `customMapper` mapping function.
+The `observe(...)` function has an additional parameter to provide a custom `customMapper` mapping function.
 Initially this will be:
 ```ts
 action => action
 ```
 
-To use a custom mapper, provide it as second argument in the `@Observe(...)` annotation.
+To use a custom mapper, provide it as second argument in the `observe(...)` function.
 
 ```ts
 export const toData = action => action.data;
 
 ...
-@Observe([dataLoadedAction], toData)
-dataLoaded$: Observable<Data>;
+dataLoaded$ = observe([dataLoadedAction], toData);
 ```
 
 # Testing
@@ -294,7 +250,7 @@ Testing your components and the StoreService is easy. The `@ngxp/store-service/t
 
 ### Testing Selectors
 
-To test selectors you provide the `StoreService` using the `provideStoreServiceMock` method in the testing module of your component. Then cast the store service instance using the `StoreServiceMock<T>` class to get the correct typings.
+To test selectors you provide the `StoreService` using the `provideStoreServiceMock` method in the testing module of your component. Then get the `StoreServiceMock<T>` instance using the `getStoreServiceMock` helper function.
 
 
 ```ts
@@ -345,7 +301,7 @@ The `BehaviorSubject` for `getAllBooks` is now initialized with an empty array i
 
 ### Testing Actions
 
-To test if a component calls the dispatch methods you provide the `StoreService` using the `provideStoreServiceMock` method in the testing module of your component. Then cast the store service instance using the `StoreServiceMock<T>` class to get the correct typings.
+To test if a component calls the dispatch methods you provide the `StoreService` using the `provideStoreServiceMock` method in the testing module of your component. Then get the `StoreServiceMock<T>` instance using the `getStoreServiceMock` helper function.
 
 You can then spy on the method as usual.
 
@@ -376,7 +332,7 @@ it('adds a new book', () => {
 
 ### Testing Observers
 
-To test observers inside components you provide the `StoreService` using the `provideStoreServiceMock` method in the testing module of your component. Then cast the store service instance using the `StoreServiceMock<T>` class to get the correct typings.
+To test observers inside components you provide the `StoreService` using the `provideStoreServiceMock` method in the testing module of your component. Then get the `StoreServiceMock<T>` instance using the `getStoreServiceMock` helper function.
 
 
 ```ts
@@ -399,7 +355,7 @@ bookStoreService = getStoreServiceMock(BookStoreService);
 The `StoreServiceMock` class replaces all observer properties on the store service class with a `BehaviorSubject`. So now you can do the following to emit new values to the subscribers:
 
 ```ts
-bookStoreService.booksLoaded$.next(true);
+bookStoreService.booksLoaded$().next(true);
 ```
 
 The `BehaviorSubject` is initialized with the value being `undefined`. If you want a custom initial value, the `provideStoreServiceMock` method offers an optional parameter. This is an object of key value pairs where the key is the name of the observer property, e.g. `booksLoaded$`.
@@ -580,7 +536,7 @@ describe('BookStoreService', () => {
 
         const expected = cold('a', { a: action });
         
-        expect(bookStoreService.booksLoaded$).toBeObservable(expected);
+        expect(bookStoreService.booksLoaded$()).toBeObservable(expected);
     });
 });
 
