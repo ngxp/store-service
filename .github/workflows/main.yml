@@ -21,14 +21,14 @@ jobs:
         with:
           node-version: '14'
       - run: npm install
-      - run: npm run test-ci:lib
+      #- run: npm run test-ci:lib
       - run: npm run build-ci:lib
       - run: cp README.md dist/$PROJECT/README.md
       - uses: JS-DevTools/npm-publish@v1
         with:
           token: ${{ secrets.NPM_TOKEN }}
           dry-run: true
-          package: "./dist/$PROJECT/package.json"
+          package: ./dist/${{ env.PROJECT }}/package.json
     
       
     
