@@ -1,5 +1,5 @@
 import { ofType } from '@ngrx/effects';
-import { ActionCreator, Creator, Action } from '@ngrx/store';
+import { ActionCreator, Creator, Action, MemoizedSelector } from '@ngrx/store';
 import { map } from 'rxjs/operators';
 import { Type } from '@angular/core';
 import { Observable } from 'rxjs';
@@ -12,14 +12,20 @@ export const STORE_SERVICE_OBSERVERS = '__STORE_SERVICE_OBSERVERS';
 type Selector<T, V> = (state: T) => V;
 type SelectorWithProps<State, Props, Result> = (state: State, props: Props) => Result;
 
-export function Select<S, P, R>(selectorFn: Selector<S, R> | SelectorWithProps<S, P, R>): PropertyDecorator {
+export function Select<S, P, R>(selectorFn: Selector<S, R> | SelectorWithProps<S, P, R> | ((...props: P[]) => MemoizedSelector<any, any>)): PropertyDecorator {
     return (target, propertyKey) => {
         if (!Array.isArray(target[STORE_SERVICE_SELECTORS])) {
             target[STORE_SERVICE_SELECTORS] = [];
         }
 
-        target[propertyKey] = function (props?: any) {
-            return this.store.select(selectorFn, props);
+        target[propertyKey] = function (...props: any) {
+            if (selectorFn.hasOwnProperty('projector')) {
+                // MemoizedSelector OR MemoizedSelectorWithProps
+                return this.store.select(selectorFn, ...props);
+            } else {
+                // Factory Selector (...props) => MemoizedSelector
+                 return this.store.select((selectorFn as unknown as Function)(...props));
+            }
         };
 
         target[STORE_SERVICE_SELECTORS] = [
@@ -84,10 +90,16 @@ export function Observe(
     };
 }
 
-
 export function select<S>(selectorFn: S): SelectorReturnType<S> {
-    const fn = function (props: any) {
-        return this.store.select(selectorFn, props);
+    const fn = function (...props: any) {
+        if (selectorFn.hasOwnProperty('projector')) {
+            // MemoizedSelector OR MemoizedSelectorWithProps
+            return this.store.select(selectorFn, ...props);
+        } else {
+            // Factory Selector (...props) => MemoizedSelector
+             return this.store.select((selectorFn as unknown as Function)(...props));
+        }
+
     };
 
     Object.defineProperty(fn, STORE_SERVICE_SELECTORS, {

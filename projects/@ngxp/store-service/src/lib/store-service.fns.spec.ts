@@ -1,4 +1,3 @@
-import { fakeAsync, tick } from "@angular/core/testing";
 import { Actions } from "@ngrx/effects";
 import { Action, createAction, createSelector, props } from "@ngrx/store";
 import { getMockStore, MockStore } from "@ngrx/store/testing";
@@ -30,6 +29,11 @@ describe('StoreService Functions', () => {
         (state: State, bookName: string) => state.books.find(book => book === bookName)
     );
 
+    const selectBookByNameWithFactory = (props: { name: string }) => createSelector(
+        s => s,
+        (state: State) => state.books.find(book => book === props.name)
+    );
+
     let store: MockStore<State>;
     let actionsSubject: Subject<Action>;
     let actions: Actions;
@@ -39,6 +43,7 @@ describe('StoreService Functions', () => {
 
         books = select(selectBooks);
         bookByName = select(selectBookByName);
+        bookByNameWithFactory = select(selectBookByNameWithFactory);
 
         loadBook = dispatch(loadBook);
         loadBooks = dispatch(loadBooks);
@@ -77,6 +82,18 @@ describe('StoreService Functions', () => {
 
             expect(testService.bookByName(title)).toBeObservable(expected);
         });
+        it('provides observable with props with factory', () => {
+            const title = 'React';
+            const expected = hot('a', { a: title });
+
+            expect(testService.bookByNameWithFactory({ name: title })).toBeObservable(expected);
+        });
+        it('provides observable with invalid props with factory', () => {
+            const title = 'Invalid';
+            const expected = hot('a', { a: undefined });
+
+            expect(testService.bookByNameWithFactory({ name: title })).toBeObservable(expected);
+        });
         it('can be spied upon', (done) => {
             const overwrittenValue = 'overwrittenProperty';
             const bookByNameSpy = spyOn(testService, 'bookByName').and.returnValue(of(overwrittenValue));
@@ -92,6 +109,7 @@ describe('StoreService Functions', () => {
         it('sets the internal STORE_SERVICE_SELECTORS variable', () => {
             expect(testService.books[STORE_SERVICE_SELECTORS]).toBe(true);
             expect(testService.bookByName[STORE_SERVICE_SELECTORS]).toBe(true);
+            expect(testService.bookByNameWithFactory[STORE_SERVICE_SELECTORS]).toBe(true);
         });
     });
 
@@ -159,6 +177,4 @@ describe('StoreService Functions', () => {
         });
 
     });
-
-
 })
