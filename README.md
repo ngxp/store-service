@@ -17,6 +17,7 @@ Adds an abstraction layer between Angular components and the [@ngrx](https://git
         * [Use objects with type property](#objects-with-type-property)
         * [String action types](#string-action-types)
         * [Custom mapper](#custom-mapper)
+    * [Deprecated Annotations](#deprecated-annotations)
 * [Testing](#testing)
     * [Testing Components](#testing-components)
         * [Testing Selectors](#testing-selectors)
@@ -241,6 +242,23 @@ export const toData = action => action.data;
 
 ...
 dataLoaded$ = observe([dataLoadedAction], toData);
+```
+
+## Deprecated Annotations
+
+Before Version 12 the Store Service used annotations instead of functions. This old way still works but is deprecated and _will be removed in the future_.
+
+```ts
+import { Select, StoreService, Dispatch, Selector, Dispatcher, Observe } from '@ngxp/store-service';
+
+@Select(getBooks)
+getAllBooks: Selector<typeof getBooks>;
+
+@Dispatch(addBookAction)
+addBook: Dispatcher<typeof addBookAction>;
+
+@Observe([dataLoadedAction], toData)
+dataLoaded$: Observable<Book[]>;
 ```
 
 # Testing

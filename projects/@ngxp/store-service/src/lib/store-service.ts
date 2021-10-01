@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Actions } from '@ngrx/effects';
-import { ActionCreator, MemoizedSelector, MemoizedSelectorWithProps, Store } from '@ngrx/store';
-import { FunctionWithParametersType } from '@ngrx/store/src/models';
+import { ActionCreator, MemoizedSelector, MemoizedSelectorWithProps, Store, FunctionWithParametersType } from '@ngrx/store';
 import { Observable } from 'rxjs';
 
 @Injectable()

@@ -12,6 +12,9 @@ export const STORE_SERVICE_OBSERVERS = '__STORE_SERVICE_OBSERVERS';
 type Selector<T, V> = (state: T) => V;
 type SelectorWithProps<State, Props, Result> = (state: State, props: Props) => Result;
 
+/**
+ * @deprecated Annotations are deprecated. Use `select(...)` instead
+ */
 export function Select<S, P, R>(selectorFn: Selector<S, R> | SelectorWithProps<S, P, R> | ((...props: P[]) => MemoizedSelector<any, any>)): PropertyDecorator {
     return (target, propertyKey) => {
         if (!Array.isArray(target[STORE_SERVICE_SELECTORS])) {
@@ -35,6 +38,9 @@ export function Select<S, P, R>(selectorFn: Selector<S, R> | SelectorWithProps<S
     };
 }
 
+/**
+ * @deprecated Annotations are deprecated. Use `dispatch(...)` instead
+ */
 export function Dispatch<T extends string, C extends Creator, A extends Action>(
     actionCreator: ActionCreator<T, C> | Type<A>
 ): PropertyDecorator {
@@ -58,6 +64,9 @@ export function Dispatch<T extends string, C extends Creator, A extends Action>(
     };
 }
 
+/**
+ * @deprecated Annotations are deprecated. Use `observe(...)` instead
+ */
 export function Observe(
     actions: (string | ActionCreator)[],
     customMapper: (action) => any = (action: any) => action
