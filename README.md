@@ -339,7 +339,7 @@ TestBed.configureTestingModule({
 ...
 it('adds a new book', () => {
     const book: Book = getBook();
-    const addBookSpy = spyOn(bookStoreService, 'addBook');
+    const addBookSpy = jest.spyOn(bookStoreService, 'addBook');
 
     component.book = book;
     component.addBook();
@@ -562,14 +562,14 @@ describe('BookStoreService', () => {
 
 # Examples
 
-For detailed examples of all this have a look at the Angular Project in [the src/app folder](src/app).
+For detailed examples of all this have a look at the Angular Project in [the apps/store-service-sample folder](apps/store-service-sample/src/app).
 
 ## Example Store Service
 
-Have a look at the [BookStoreService](src/app/shared/books/book-store.service.ts)
+Have a look at the [BookStoreService](apps/store-service-sample/src/app/shared/books/book-store.service.ts)
 
 ## Example Tests
 
-For examples on Component Tests please have look at the test for the [BookListComponent](src/app/components/book-list/book-list.component.spec.ts) and the [NewBookComponent](src/app/components/new-book/new-book.component.spec.ts)
+For examples on Component Tests please have look at the test for the [BookListComponent](apps/store-service-sample/src/app/components/book-list/book-list.component.spec.ts) and the [NewBookComponent](apps/store-service-sample/src/app/components/new-book/new-book.component.spec.ts)
 
-Testing the `StoreService` is also very easy. For an example have a look at the [BookStoreService](src/app/shared/books/book-store.service.spec.ts)
+Testing the `StoreService` is also very easy. For an example have a look at the [BookStoreService](apps/store-service-sample/src/app/shared/books/book-store.service.spec.ts)

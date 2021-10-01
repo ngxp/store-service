@@ -12,7 +12,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env:
-      PROJECT: "@ngxp/store-service"
+      PROJECT: "libs/store-service"
 
     steps:
       - uses: actions/checkout@v2
