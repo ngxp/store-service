@@ -18,7 +18,7 @@ export class BookDetailComponent {
         private bookStoreService: BookStoreService
     ) {
         const bookId = this.activatedRoute.snapshot.params.bookId;
-        this.book$ = this.bookStoreService.getBook({ id: bookId });
+        this.book$ = this.bookStoreService.getBookById({ id: bookId });
     }
 
 }
