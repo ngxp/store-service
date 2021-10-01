@@ -12,3 +12,7 @@ export const selectBook = createSelector(
     selectBooks,
     (books: Book[], props: { id: number }) => books[props.id]
 );
+export const selectBookById = (props: { id: number }) => createSelector(
+    selectBooks,
+    (books: Book[]) => books[props.id]
+);
