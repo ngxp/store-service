@@ -19,16 +19,7 @@
             }
         }
     },
-    "targetDependencies": {
-        "build": [
-            {
-                "target": "build",
-                "projects": "dependencies"
-            }
-        ]
-    },
     "cli": {
-        "defaultCollection": "@nrwl/angular",
         "packageManager": "npm"
     },
     "defaultProject": "store-service-sample",
@@ -56,6 +47,12 @@
         },
         "@nrwl/angular:component": {
             "style": "scss"
+        }
+    },
+    "$schema": "./node_modules/nx/schemas/nx-schema.json",
+    "targetDefaults": {
+        "build": {
+            "dependsOn": ["^build"]
         }
     }
 }
