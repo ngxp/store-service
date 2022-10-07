@@ -16,7 +16,9 @@
         "baseUrl": ".",
         "paths": {
             "@ngxp/store-service": ["libs/store-service/src/index.ts"],
-            "@ngxp/store-service/testing": ["libs/store-service/testing/src/public_api.ts"]
+            "@ngxp/store-service/testing": [
+                "libs/store-service/testing/src/public_api.ts"
+            ]
         }
     },
     "exclude": ["node_modules", "tmp"]
