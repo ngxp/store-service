@@ -19,7 +19,7 @@ describe('StoreService Functions', () => {
     const booksLoaded = createAction('All books loaded', props<{ books: string[] }>());
     const booksLoadFailed = createAction('Books load failed', props<{ error: string }>());
 
-    const selectBooks = createSelector<State, any, string[]>(
+    const selectBooks = createSelector<State,[any],string[]>(
         s => s,
         state => state.books
     );
@@ -29,7 +29,7 @@ describe('StoreService Functions', () => {
         (state: State, bookName: string) => state.books.find(book => book === bookName)
     );
 
-    const selectBookByNameWithFactory = (props: { name: string }) => createSelector(
+    const selectBookByNameWithFactory = (props: { name: string }) => createSelector<State,[any],string>(
         s => s,
         (state: State) => state.books.find(book => book === props.name)
     );

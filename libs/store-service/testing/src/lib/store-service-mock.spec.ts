@@ -15,7 +15,7 @@ describe('StoreServiceMock', () => {
     const loadBooks = createAction('Load all Books');
     const booksLoaded = createAction('All books loaded', props<{ books: string[] }>());
 
-    const selectBooks = createSelector<State, any, string[]>(
+    const selectBooks = createSelector<State,[any],string[]>(
         s => s,
         state => state.books
     );
