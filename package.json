@@ -26,7 +26,7 @@
     "@angular/router": "14.2.5",
     "@ngrx/effects": "14.0.2",
     "@ngrx/store": "14.0.2",
-    "@nrwl/angular": "14.8.3",
+    "@nrwl/angular": "15.0.13",
     "rxjs": "~6.6.0",
     "tslib": "^2.0.0",
     "zone.js": "0.11.8"
