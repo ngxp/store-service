@@ -2,7 +2,7 @@ import { TestBed, waitForAsync } from '@angular/core/testing';
 import { provideMockActions } from '@ngrx/effects/testing';
 import { MockStore, provideMockStore } from '@ngrx/store/testing';
 import { getBook } from 'apps/store-service-sample/src/test/books';
-import { cold } from 'jasmine-marbles';
+import { cold } from 'jest-marbles';
 import { BehaviorSubject } from 'rxjs';
 import { addBookAction, booksLoadedAction, loadBooksAction } from '../../store/books/books.actions';
 import { BookState } from '../../store/books/books.reducer';

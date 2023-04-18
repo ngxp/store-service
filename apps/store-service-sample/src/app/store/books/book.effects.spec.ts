@@ -1,6 +1,6 @@
 import { Actions } from '@ngrx/effects';
 import { getBooks } from 'apps/store-service-sample/src/test/books';
-import { cold } from 'jasmine-marbles';
+import { cold } from 'jest-marbles';
 import { of } from 'rxjs';
 import { BookService } from '../../shared/books/book.service';
 import { BookEffects } from './book.effects';

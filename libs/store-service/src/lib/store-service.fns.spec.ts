@@ -1,7 +1,7 @@
 import { Actions } from "@ngrx/effects";
 import { Action, createAction, createSelector, props } from "@ngrx/store";
 import { getMockStore, MockStore } from "@ngrx/store/testing";
-import { hot } from "jasmine-marbles";
+import { hot } from "jest-marbles";
 import { of, Subject } from "rxjs";
 import { StoreService } from "./store-service";
 import { dispatch, observe, select, STORE_SERVICE_ACTIONS, STORE_SERVICE_OBSERVERS, STORE_SERVICE_SELECTORS } from "./store-service.annotations";

@@ -475,7 +475,7 @@ To test if the `StoreService` dispatches the correct actions the `MockStore` fro
 
 ```ts
 import { MockStore, provideMockStore, getStoreServiceMock } from '@ngrx/store/testing';
-import { cold } from 'jasmine-marbles';
+import { cold } from 'jest-marbles';
 import { BookStoreService } from 'src/app/shared/books/book-store.service';
 import { addBookAction, loadBooksAction } from '../../store/books/books.actions';
 
