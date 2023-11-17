@@ -1,10 +1,10 @@
 import { Actions } from "@ngrx/effects";
 import { Action, createAction, createSelector, props } from "@ngrx/store";
-import { getMockStore, MockStore } from "@ngrx/store/testing";
+import { MockStore, createMockStore } from "@ngrx/store/testing";
 import { hot } from "jest-marbles";
-import { of, Subject } from "rxjs";
+import { Subject, of } from "rxjs";
 import { StoreService } from "./store-service";
-import { dispatch, observe, select, STORE_SERVICE_ACTIONS, STORE_SERVICE_OBSERVERS, STORE_SERVICE_SELECTORS } from "./store-service.annotations";
+import { STORE_SERVICE_ACTIONS, STORE_SERVICE_OBSERVERS, STORE_SERVICE_SELECTORS, dispatch, observe, select } from "./store-service.annotations";
 
 describe('StoreService Functions', () => {
     interface State {
@@ -55,7 +55,7 @@ describe('StoreService Functions', () => {
     let testService: StoreServiceToTest;
 
     beforeEach(() => {
-        store = getMockStore({
+        store = createMockStore({
             initialState
         });
         actionsSubject = new Subject<Action>();

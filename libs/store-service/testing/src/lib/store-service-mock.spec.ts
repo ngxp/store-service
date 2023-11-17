@@ -1,10 +1,8 @@
-import { Actions } from "@ngrx/effects";
-import { Action, createAction, createSelector, props } from "@ngrx/store";
-import { getMockStore, MockStore } from "@ngrx/store/testing";
-import { createStoreServiceMock, StoreServiceMock } from "./store-service-mock";
-import { BehaviorSubject, Observable, Subject } from "rxjs";
+import { createAction, createSelector, props } from "@ngrx/store";
+import { BehaviorSubject, Observable } from "rxjs";
 import { Dispatcher, Selector, StoreService } from "../../../src/lib/store-service";
-import { select, dispatch, observe, Select, Dispatch, Observe } from "../../../src/lib/store-service.annotations";
+import { Dispatch, Observe, Select, dispatch, observe, select } from "../../../src/lib/store-service.annotations";
+import { createStoreServiceMock } from "./store-service-mock";
 
 describe('StoreServiceMock', () => {
     interface State {

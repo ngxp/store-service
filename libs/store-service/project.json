@@ -1,0 +1,44 @@
+{
+    "name": "store-service",
+    "$schema": "../../node_modules/nx/schemas/project-schema.json",
+    "projectType": "library",
+    "sourceRoot": "libs/store-service/src",
+    "prefix": "ngxp",
+    "targets": {
+        "build": {
+            "executor": "@nx/angular:package",
+            "outputs": ["{workspaceRoot}/dist/libs/store-service"],
+            "options": {
+                "project": "libs/store-service/ng-package.json"
+            },
+            "configurations": {
+                "production": {
+                    "tsConfig": "libs/store-service/tsconfig.lib.prod.json"
+                },
+                "development": {
+                    "tsConfig": "libs/store-service/tsconfig.lib.json"
+                }
+            },
+            "defaultConfiguration": "production"
+        },
+        "test": {
+            "executor": "@nx/jest:jest",
+            "outputs": ["{workspaceRoot}/coverage/libs/store-service"],
+            "options": {
+                "jestConfig": "libs/store-service/jest.config.ts",
+                "passWithNoTests": true
+            }
+        },
+        "lint": {
+            "executor": "@nx/linter:eslint",
+            "options": {
+                "lintFilePatterns": [
+                    "libs/store-service/src/**/*.ts",
+                    "libs/store-service/src/**/*.html",
+                    "libs/store-service/package.json"
+                ]
+            }
+        }
+    },
+    "tags": []
+}
