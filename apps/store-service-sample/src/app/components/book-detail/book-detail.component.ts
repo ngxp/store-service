@@ -7,7 +7,8 @@ import { Book } from '../../shared/books/book.model';
 @Component({
     selector: 'nss-book-detail',
     templateUrl: './book-detail.component.html',
-    styleUrls: ['./book-detail.component.scss']
+    styleUrls: ['./book-detail.component.scss'],
+    standalone: false
 })
 export class BookDetailComponent {
 

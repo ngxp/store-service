@@ -7,7 +7,8 @@ import { Book } from '../../shared/books/book.model';
 @Component({
     selector: 'nss-book-list',
     templateUrl: './book-list.component.html',
-    styleUrls: ['./book-list.component.scss']
+    styleUrls: ['./book-list.component.scss'],
+    standalone: false
 })
 export class BookListComponent implements OnDestroy {
 
