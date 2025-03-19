@@ -26,16 +26,16 @@
         "url": "https://github.com/ngxp/store-service/issues"
     },
     "license": "MIT",
-    "version": "17.0.0",
+    "version": "18.0.0",
     "dependencies": {
         "tslib": "^2.6.0"
     },
     "peerDependencies": {
-        "@angular/platform-browser-dynamic": "^17.0.0",
-        "@angular/common": "^17.0.0",
-        "@angular/core": "^17.0.0",
-        "@ngrx/effects": "^17.0.0",
-        "@ngrx/store": "^17.0.0",
+        "@angular/platform-browser-dynamic": "^18.0.0",
+        "@angular/common": "^18.0.0",
+        "@angular/core": "^18.0.0",
+        "@ngrx/effects": "^18.0.0",
+        "@ngrx/store": "^18.0.0",
         "rxjs": "^6.6.0 || ^7.0.0"
     }
 }

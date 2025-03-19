@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Actions } from '@ngrx/effects';
 import { Action, createAction, createSelector, MemoizedSelector, MemoizedSelectorWithProps, props } from '@ngrx/store';
-import { TypedAction } from '@ngrx/store/src/models';
 import { Observable, of, Subject } from 'rxjs';
 import { take } from 'rxjs/operators';
 import { StoreService } from './store-service';
@@ -115,7 +114,7 @@ describe('Ngrx Store Service Annotations', () => {
 
             expect(storeDispatchSpy).toHaveBeenCalled();
 
-            const dispatchedAction = <TypedAction<any> & { entity: any }>store.dispatchedActions[store.dispatchedActions.length - 1];
+            const dispatchedAction = <Action<any> & { entity: any }>store.dispatchedActions[store.dispatchedActions.length - 1];
 
             expect(dispatchedAction.type).toBe(actionType);
             expect(dispatchedAction.entity).toBe(entity);
