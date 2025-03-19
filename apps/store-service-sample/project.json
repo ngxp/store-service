@@ -59,10 +59,10 @@
             "executor": "@angular-devkit/build-angular:dev-server",
             "configurations": {
                 "production": {
-                    "browserTarget": "store-service-sample:build:production"
+                    "buildTarget": "store-service-sample:build:production"
                 },
                 "development": {
-                    "browserTarget": "store-service-sample:build:development"
+                    "buildTarget": "store-service-sample:build:development"
                 }
             },
             "defaultConfiguration": "development"
@@ -70,24 +70,17 @@
         "extract-i18n": {
             "executor": "@angular-devkit/build-angular:extract-i18n",
             "options": {
-                "browserTarget": "store-service-sample:build"
+                "buildTarget": "store-service-sample:build"
             }
         },
         "lint": {
-            "executor": "@nx/linter:eslint",
-            "options": {
-                "lintFilePatterns": [
-                    "apps/store-service-sample/src/**/*.ts",
-                    "apps/store-service-sample/src/**/*.html"
-                ]
-            }
+            "executor": "@nx/eslint:lint"
         },
         "test": {
             "executor": "@nx/jest:jest",
             "outputs": ["{workspaceRoot}/coverage/apps/store-service-sample"],
             "options": {
-                "jestConfig": "apps/store-service-sample/jest.config.ts",
-                "passWithNoTests": true
+                "jestConfig": "apps/store-service-sample/jest.config.ts"
             }
         }
     },

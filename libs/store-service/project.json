@@ -25,19 +25,11 @@
             "executor": "@nx/jest:jest",
             "outputs": ["{workspaceRoot}/coverage/libs/store-service"],
             "options": {
-                "jestConfig": "libs/store-service/jest.config.ts",
-                "passWithNoTests": true
+                "jestConfig": "libs/store-service/jest.config.ts"
             }
         },
         "lint": {
-            "executor": "@nx/linter:eslint",
-            "options": {
-                "lintFilePatterns": [
-                    "libs/store-service/src/**/*.ts",
-                    "libs/store-service/src/**/*.html",
-                    "libs/store-service/package.json"
-                ]
-            }
+            "executor": "@nx/eslint:lint"
         }
     },
     "tags": []
