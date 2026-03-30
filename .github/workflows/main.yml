@@ -16,7 +16,7 @@ jobs:
 
     runs-on: ubuntu-latest
     env:
-      PROJECT: "rest"
+      PROJECT: "libs/store-service"
 
     steps:
       - uses: actions/checkout@v6
