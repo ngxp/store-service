@@ -4,7 +4,11 @@ import { MockStore, provideMockStore } from '@ngrx/store/testing';
 import { getBook } from 'apps/store-service-sample/src/test/books';
 import { cold } from 'jest-marbles';
 import { BehaviorSubject } from 'rxjs';
-import { addBookAction, booksLoadedAction, loadBooksAction } from '../../store/books/books.actions';
+import {
+    addBookAction,
+    booksLoadedAction,
+    loadBooksAction,
+} from '../../store/books/books.actions';
 import { BookState } from '../../store/books/books.reducer';
 import { selectBook, selectBooks } from '../../store/books/books.selectors';
 import { BookStoreService } from './book-store.service';
@@ -19,8 +23,8 @@ describe('BookStoreService', () => {
         {
             author: 'Joost',
             title: 'Testing the StoreService',
-            year: 2019
-        }
+            year: 2019,
+        },
     ];
 
     beforeEach(waitForAsync(() => {
@@ -31,16 +35,16 @@ describe('BookStoreService', () => {
                     selectors: [
                         {
                             selector: selectBooks,
-                            value: books
+                            value: books,
                         },
                         {
                             selector: selectBook,
-                            value: books[0]
-                        }
-                    ]
+                            value: books[0],
+                        },
+                    ],
                 }),
-                provideMockActions(mockActions)
-            ]
+                provideMockActions(mockActions),
+            ],
         });
     }));
 
@@ -57,27 +61,31 @@ describe('BookStoreService', () => {
     it('executes the getBook Selector', () => {
         const expected = cold('a', { a: books[0] });
 
-        expect(bookStoreService.getBookById({ id: 0 })).toBeObservable(expected);
+        expect(bookStoreService.getBookById({ id: 0 })).toBeObservable(
+            expected
+        );
     });
     it('dispatches a new AddBookAction', () => {
+        const dispatchSpy = jest.spyOn(mockStore, 'dispatch');
         const book: Book = getBook();
         bookStoreService.addBook({ book });
 
-        const expected = cold('a', { a: addBookAction({ book }) });
-        expect(mockStore.scannedActions$).toBeObservable(expected);
+        expect(dispatchSpy).toHaveBeenCalledWith(addBookAction({ book }));
     });
     it('dispatches a new LoadBooksAction', () => {
+        const dispatchSpy = jest.spyOn(mockStore, 'dispatch');
         bookStoreService.loadBooks();
 
-        const expected = cold('a', { a: loadBooksAction() });
-        expect(mockStore.scannedActions$).toBeObservable(expected);
+        expect(dispatchSpy).toHaveBeenCalledWith(loadBooksAction());
     });
     it('filters the BooksLoadedActions in booksLoaded$', () => {
-        const expectedValue: Book[] = [{
-            author: 'Author',
-            title: 'Title',
-            year: 2018
-        }];
+        const expectedValue: Book[] = [
+            {
+                author: 'Author',
+                title: 'Title',
+                year: 2018,
+            },
+        ];
 
         const action = booksLoadedAction({ books: expectedValue });
         mockActions.next(action);

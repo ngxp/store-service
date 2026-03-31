@@ -82,7 +82,8 @@
             "executor": "@nx/jest:jest",
             "outputs": ["{workspaceRoot}/coverage/apps/store-service-sample"],
             "options": {
-                "jestConfig": "apps/store-service-sample/jest.config.ts"
+                "jestConfig": "apps/store-service-sample/jest.config.ts",
+                "tsConfig": "apps/store-service-sample/tsconfig.spec.json"
             }
         }
     }

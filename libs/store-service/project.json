@@ -4,20 +4,20 @@
     "projectType": "library",
     "sourceRoot": "libs/store-service/src",
     "prefix": "ngxp",
+    "tags": [],
     "targets": {
         "build": {
             "executor": "@nx/angular:package",
             "outputs": ["{workspaceRoot}/dist/libs/store-service"],
             "options": {
-                "project": "libs/store-service/ng-package.json"
+                "project": "libs/store-service/ng-package.json",
+                "tsConfig": "libs/store-service/tsconfig.lib.json"
             },
             "configurations": {
                 "production": {
                     "tsConfig": "libs/store-service/tsconfig.lib.prod.json"
                 },
-                "development": {
-                    "tsConfig": "libs/store-service/tsconfig.lib.json"
-                }
+                "development": {}
             },
             "defaultConfiguration": "production"
         },
@@ -25,12 +25,12 @@
             "executor": "@nx/jest:jest",
             "outputs": ["{workspaceRoot}/coverage/libs/store-service"],
             "options": {
-                "jestConfig": "libs/store-service/jest.config.ts"
+                "jestConfig": "libs/store-service/jest.config.ts",
+                "tsConfig": "libs/store-service/tsconfig.spec.json"
             }
         },
         "lint": {
             "executor": "@nx/eslint:lint"
         }
-    },
-    "tags": []
+    }
 }
